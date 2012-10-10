@@ -4,22 +4,22 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class MainView extends JFrame {
 
@@ -120,19 +120,21 @@ public class MainView extends JFrame {
 		btnNewButton_5.setBounds(140, 83, 50, 23);
 		panel.add(btnNewButton_5);
 
-		// Inicializa todos os eventos
-		initializeEvents(panel, btnNewButton, btnNewButton_1, btnNewButton_2,
-				btnNewButton_3, btnNewButton_4, btnNewButton_5);
-		
 		JButton btnOk = new JButton("OK");
 		btnOk.setBounds(44, 117, 98, 23);
 		panel.add(btnOk);
+
+		// Inicializa todos os eventos
+		initializeEvents(panel, btnNewButton, btnNewButton_1, btnNewButton_2,
+				btnNewButton_3, btnNewButton_4, btnNewButton_5, btnOk);
+
 	}
 
 	public void initializeEvents(final JPanel panel,
 			final JButton btnNewButton, final JButton btnNewButton_1,
 			final JButton btnNewButton_2, final JButton btnNewButton_3,
-			final JButton btnNewButton_4, final JButton btnNewButton_5) {
+			final JButton btnNewButton_4, final JButton btnNewButton_5,
+			final JButton btnOk) {
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
@@ -152,52 +154,57 @@ public class MainView extends JFrame {
 				}
 			}
 		});
-		
+
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
-				passwordField.setText(new String(passwordField.getPassword())+ " ");
+				passwordField.setText(new String(passwordField.getPassword())
+						+ " ");
 			}
 		});
-		
+
 		btnNewButton_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
-				passwordField.setText(new String(passwordField.getPassword())+ " ");
+				passwordField.setText(new String(passwordField.getPassword())
+						+ " ");
 			}
 		});
-		
+
 		btnNewButton_2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
-				passwordField.setText(new String(passwordField.getPassword())+ " ");
+				passwordField.setText(new String(passwordField.getPassword())
+						+ " ");
 			}
 		});
-		
+
 		btnNewButton_3.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
-				passwordField.setText(new String(passwordField.getPassword())+ " ");
+				passwordField.setText(new String(passwordField.getPassword())
+						+ " ");
 			}
 		});
-		
+
 		btnNewButton_4.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
-				passwordField.setText(new String(passwordField.getPassword())+ " ");
+				passwordField.setText(new String(passwordField.getPassword())
+						+ " ");
 			}
 		});
-		
+
 		btnNewButton_5.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -208,6 +215,22 @@ public class MainView extends JFrame {
 					pass = "";
 				}
 				passwordField.setText(pass);
+			}
+		});
+
+		btnOk.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				String pass = new String(passwordField.getPassword());
+				if (pass.length() < 8) {
+					JOptionPane.showMessageDialog(null,
+							"Senha muito curta, mínimo de 8 dígitos!");
+					return;
+				} else if (pass.length() > 10) {
+					JOptionPane.showMessageDialog(null,
+							"Senha muito longa, máximo de 10 dígitos!");
+					return;
+				}
 			}
 		});
 
@@ -227,11 +250,16 @@ public class MainView extends JFrame {
 
 		}
 
-		btnNewButton.setText(newArray.get(1).toString() + newArray.get(2).toString());
-		btnNewButton_1.setText(newArray.get(3).toString() + newArray.get(4).toString());
-		btnNewButton_2.setText(newArray.get(5).toString() + newArray.get(6).toString());
-		btnNewButton_3.setText(newArray.get(7).toString() + newArray.get(8).toString());
-		btnNewButton_4.setText(newArray.get(9).toString() + newArray.get(0).toString());
+		btnNewButton.setText(newArray.get(1).toString()
+				+ newArray.get(2).toString());
+		btnNewButton_1.setText(newArray.get(3).toString()
+				+ newArray.get(4).toString());
+		btnNewButton_2.setText(newArray.get(5).toString()
+				+ newArray.get(6).toString());
+		btnNewButton_3.setText(newArray.get(7).toString()
+				+ newArray.get(8).toString());
+		btnNewButton_4.setText(newArray.get(9).toString()
+				+ newArray.get(0).toString());
 
 		return;
 	}
