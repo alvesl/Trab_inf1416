@@ -17,8 +17,14 @@ public class User {
 	// Password to be inserted into Database
 	private String dbPassword;
 	
+	// Number of times user loged in the system
+	private Integer numLoged;
 	
-	// Public Constructors
+	
+	/***********
+	 * Public Constructors
+	 * 
+	 */
 	public User() {
 		
 	}
@@ -30,16 +36,35 @@ public class User {
 		this.groupID = groupID;
 		this.password = password;
 		this.publicKey = publicKey;
+		this.numLoged = 0;
 	}
 	
-	// Check Password
+	public User(String username, String fullName, Integer groupID, String password, String publicKey, Integer numLoged) {
+		
+		this.username = username;
+		this.fullName = fullName;
+		this.groupID = groupID;
+		this.password = password;
+		this.publicKey = publicKey;
+		this.numLoged = numLoged;
+	}
+
+	
+	/***********
+	 * User methods
+	 * 
+	 */
+	
 	public static boolean checkpassword(String passwd)
 	{
 		// TODO Verificar forca da senha
 		return true;
 	}
 	
-	// Getters & Setters
+	/***********
+	 * Getters and Setters
+	 * 
+	 */
 	public Integer getID() {
 		return ID;
 	}
@@ -81,6 +106,12 @@ public class User {
 	}
 	public void setDbPassword(String dbPassword) {
 		this.dbPassword = dbPassword;
+	}
+	public Integer getNumLoged() {
+		return numLoged;
+	}
+	public void setNumLoged(Integer numLoged) {
+		this.numLoged = numLoged;
 	}
 
 	

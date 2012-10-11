@@ -78,7 +78,8 @@ public class AccessJDBC {
 		Statement stmt = null;
 		String sqlInsert;
 		
-		sqlInsert = "INSERT INTO Users (Full_Name, Username, Group_ID, Public_Key) VALUES('" + user.getFullName() + "', '" + user.getUsername() + "', '" + user.getGroupID() + "', '" + user.getPublicKey() + "')";
+		sqlInsert = "INSERT INTO Users (Full_Name, Username, Group_ID, Public_Key, Num_loged) VALUES('" + user.getFullName() + "', '" + 
+					user.getUsername() + "', '" + user.getGroupID() + "', '" + user.getPublicKey() + "', '" + user.getNumLoged() + "')";
 		System.out.println(sqlInsert);
 		try {
 
