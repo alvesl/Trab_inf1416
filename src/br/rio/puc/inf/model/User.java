@@ -6,7 +6,7 @@ public class User {
 	
 	private String fullName;
 	
-	private String userName;
+	private String username;
 	
 	private Integer groupID;
 	
@@ -14,10 +14,29 @@ public class User {
 	
 	private String publicKey;
 	
+	// Password to be inserted into Database
+	private String dbPassword;
 	
-	// Public Constructor
+	
+	// Public Constructors
 	public User() {
 		
+	}
+	
+	public User(String username, String fullName, int groupID, String password, String publicKey) {
+		
+		this.username = username;
+		this.fullName = fullName;
+		this.groupID = groupID;
+		this.password = password;
+		this.publicKey = publicKey;
+	}
+	
+	// Check Password
+	public static boolean checkpassword(String passwd)
+	{
+		// TODO Verificar forca da senha
+		return true;
 	}
 	
 	// Getters & Setters
@@ -33,11 +52,11 @@ public class User {
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String userName) {
+		this.username = userName;
 	}
 	public Integer getGroupID() {
 		return groupID;
@@ -57,5 +76,12 @@ public class User {
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
 	}
+	public String getDbPassword() {
+		return dbPassword;
+	}
+	public void setDbPassword(String dbPassword) {
+		this.dbPassword = dbPassword;
+	}
+
 	
 }

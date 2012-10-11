@@ -40,7 +40,7 @@ public class BasicView {
 			System.out.println("Usuário inexistente!");
 		}
 		
-		AccessJDBC.AttemptToClose();
+		AccessJDBC.attemptToClose();
 
 	}
 
