@@ -98,6 +98,42 @@ public class AccessJDBC {
 	}
 	
 	// Returns the last user ID inserted into Users
+	public static User getUser(String username) {
+		ResultSet rs;
+		Statement stmt;
+		String sqlQuery;
+		int ID = -1;
+		String fullName = null;
+		int groupID = -1;
+		String dbPassword = null;
+		String publicKey = null;
+		int numLoged = -1;
+		
+
+		sqlQuery = "SELECT * FROM Users WHERE Username = '" + username + "'";
+		try {
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+			
+			rs.next();
+			ID = rs.getInt(1);
+			fullName = rs.getString(2);
+			groupID = rs.getInt(4);
+			dbPassword = rs.getString(5);
+			publicKey = rs.getString(6);
+			numLoged = rs.getInt(7);
+			
+			rs.close();
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return new User(ID, username, fullName, groupID, dbPassword, publicKey, numLoged);
+	}
+	
+	// Returns the last user ID inserted into Users
 	private static int getLastUserIDInserted() {
 		ResultSet rs;
 		Statement stmt;
@@ -122,16 +158,45 @@ public class AccessJDBC {
 		return ID;
 	}
 	
+	// Returns the last user ID inserted into Users
+	public static int getUserID(String username) {
+		ResultSet rs;
+		Statement stmt;
+		String sqlQuery;
+		int ID = -1;
+
+		sqlQuery = "SELECT ID FROM Users WHERE Username = '" + username + "'";
+		try {
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+			
+			rs.next();
+			ID = rs.getInt(1);
+
+			rs.close();
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return ID;
+	}
+	
 	// Insert the Database user password, which is HEX(HASH_MD5(password + ID + username))
 	private static void updateDbPasswd(User user)
 	{
 		Statement stmt = null;
 		String sqlUpdate;
 		
-		user.setDbPassword(user.getPassword() + Integer.toString(user.getID()) + user.getUsername());
+		try {
+			user.setDbPassword(User.generateDbPassword(user, "MD5"));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		sqlUpdate = "UPDATE Users SET Password = '"+ user.getDbPassword() + "' WHERE ID = " + user.getID() + "";
-		System.out.println(sqlUpdate);
 		try {
 
 			stmt = theConn.createStatement();

@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
+import br.rio.puc.inf.control.instruments.Digest;
 import br.rio.puc.inf.model.User;
 
-public class NewUserView {
+public class BasicNewUserView {
 
 	
 	public static void main(String[] args) {
@@ -21,7 +22,7 @@ public class NewUserView {
 		String passwd = null;
 		String publicKey = null;
 		
-		//Realizar leitura do login
+		// Read user info
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));  
 		try {
 			System.out.print("Login:");
@@ -57,13 +58,42 @@ public class NewUserView {
 		
 		// Insert user in DB
 		AccessJDBC.insertUser(user);
-
 		
-		//Verificar se existe usuário no banco
-		if(AccessJDBC.VerifyUser(username)) {
-			System.out.println("Usuário existe!");
-		} else {
-			System.out.println("Usuário inexistente!");
+		// Check if user is correct (login and password)
+		boolean ok = false;
+		User user2, user3;
+		while (!ok)
+		{
+			try {
+				System.out.print("Login Verificacao:");
+				username = in.readLine();
+				if(!AccessJDBC.VerifyUser(username))
+				{
+					System.out.println("Usuario inexistente");
+					continue;
+				}
+				user2 = AccessJDBC.getUser(username);
+				System.out.print("Senha Verificacao:");
+				passwd = in.readLine();
+				user3 = new User(username, null, -1, passwd, null);
+				user3.setID(AccessJDBC.getUserID(username));
+				String s1 = user2.getDbPassword();
+				String s2 = User.generateDbPassword(user3, "MD5");
+				
+				System.out.println(s1);
+				System.out.println(s2);
+				
+				if(!Digest.compareDigest(s1, s2))
+				{
+					System.out.println("Senha incorreta");
+					continue;
+				}
+				System.out.println("Login e senha Verificadas!");
+				break;
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		AccessJDBC.attemptToClose();

@@ -1,5 +1,7 @@
 package br.rio.puc.inf.model;
 
+import br.rio.puc.inf.control.instruments.Digest;
+
 public class User {
 
 	private Integer ID;
@@ -20,7 +22,6 @@ public class User {
 	// Number of times user loged in the system
 	private Integer numLoged;
 	
-	
 	/***********
 	 * Public Constructors
 	 * 
@@ -29,7 +30,7 @@ public class User {
 		
 	}
 	
-	public User(String username, String fullName, int groupID, String password, String publicKey) {
+	public User(String username, String fullName, Integer groupID, String password, String publicKey) {
 		
 		this.username = username;
 		this.fullName = fullName;
@@ -46,6 +47,17 @@ public class User {
 		this.groupID = groupID;
 		this.password = password;
 		this.publicKey = publicKey;
+		this.numLoged = 0;
+	}
+	
+	public User(int ID, String username, String fullName, Integer groupID, String dbPassword, String publicKey, Integer numLoged) {
+		
+		this.ID = ID;
+		this.username = username;
+		this.fullName = fullName;
+		this.groupID = groupID;
+		this.dbPassword = dbPassword;
+		this.publicKey = publicKey;
 		this.numLoged = numLoged;
 	}
 
@@ -55,10 +67,22 @@ public class User {
 	 * 
 	 */
 	
+	// Check Password length and strength
 	public static boolean checkpassword(String passwd)
 	{
-		// TODO Verificar forca da senha
+		// TODO Verificar tamanho e forca da senha
 		return true;
+	}
+	
+	// Generate passaword to be inserted in Db
+	public static String generateDbPassword(User user, String algorithm) throws Exception
+	{
+		Digest digest = new Digest(algorithm);
+		
+		String temp = user.getPassword() + Integer.toString(user.getID()) + user.getUsername();
+		System.out.println(temp);
+		
+		return digest.getDigest(temp);
 	}
 	
 	/***********
