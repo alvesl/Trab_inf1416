@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
 import br.rio.puc.inf.control.instruments.Digest;
+import br.rio.puc.inf.control.instruments.PasswordTest;
 import br.rio.puc.inf.model.User;
 
 public class BasicNewUserView {
@@ -41,7 +42,7 @@ public class BasicNewUserView {
 			
 			System.out.print("Senha:");
 			passwd = in.readLine();
-			while(!User.checkpassword(passwd))
+			while(!PasswordTest.testPassword(passwd))
 			{
 				System.out.println("Senha fraca. Tente de novamente.\nSenha");
 				passwd = in.readLine();
