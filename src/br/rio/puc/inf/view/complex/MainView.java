@@ -20,6 +20,8 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
+import br.rio.puc.inf.control.instruments.Digest;
+import br.rio.puc.inf.model.User;
 
 public class MainView extends JFrame {
 
@@ -27,6 +29,8 @@ public class MainView extends JFrame {
 	private JPanel contentPane;
 	private JTextField textField;
 	private JPasswordField passwordField;
+	private String currentUser;
+	
 
 	/**
 	 * Launch the application.
@@ -121,6 +125,7 @@ public class MainView extends JFrame {
 		panel.add(btnNewButton_5);
 
 		JButton btnOk = new JButton("OK");
+
 		btnOk.setBounds(44, 117, 98, 23);
 		panel.add(btnOk);
 
@@ -143,7 +148,7 @@ public class MainView extends JFrame {
 						panel.setVisible(true);
 						randomizeButtonArray(btnNewButton, btnNewButton_1,
 								btnNewButton_2, btnNewButton_3, btnNewButton_4);
-
+						currentUser = textField.getText();
 					} else {
 						JOptionPane.showMessageDialog(null,
 								"Usuário inexistente!");
@@ -231,6 +236,25 @@ public class MainView extends JFrame {
 							"Senha muito longa, máximo de 10 dígitos!");
 					return;
 				}
+				
+				// Senha ok, verificação de correção
+				User validUser = AccessJDBC.getUser(currentUser);
+				User toAuthUsr = new User(currentUser, null, -1, pass, null);
+				toAuthUsr.setID(AccessJDBC.getUserID(currentUser));
+				String passToAuth = null;
+				try {
+					passToAuth = User.generateDbPassword(toAuthUsr, "MD5");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				if(!Digest.compareDigest(passToAuth, validUser.getDbPassword()));
+				{
+					JOptionPane.showMessageDialog(null, "Senha incorreta. Sua tentativa foi logada.");
+				}
+				
+				
 			}
 		});
 
