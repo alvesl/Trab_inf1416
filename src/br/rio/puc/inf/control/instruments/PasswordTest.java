@@ -1,5 +1,7 @@
 package br.rio.puc.inf.control.instruments;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,10 +12,29 @@ public class PasswordTest {
 	 * 
 	 */
 	
+	public static void main(String[] args) {
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in)); 
+		while(true) {
+			try {
+				System.out.println("Senha:");
+				String password = in.readLine();
+				if(testPassword(password))
+					System.out.println("Senha forte");
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	// Test Password
 	public static boolean testPassword (String password)
 	{
-		if(!findRepetition(password) && !findSequence(password) && testLenght(password))
+		boolean b1 = findRepetition(password);
+		boolean b2 = findSequence(password);
+		boolean b3 = testLenght(password);
+		if(!b1 && !b2 && b3)
 			return true;
 		return false;
 	}
@@ -25,10 +46,11 @@ public class PasswordTest {
 		for (int index = 0 ; index < string.length() - 1 ; index++)
 		{
 			String subString = string.substring(index, index + 1);
-			Pattern pattern = Pattern.compile(subString);
+			String aux = subString + subString + subString;
+			Pattern pattern = Pattern.compile(aux);
 			Matcher matcher = pattern.matcher(string);
 			while(matcher.find()) {
-				if(matcher.start() == index + 1) {
+				if(matcher.start() == index ) {
 					System.out.println("Caracter repetido");
 					return true;
 				}	
@@ -46,7 +68,7 @@ public class PasswordTest {
 		for (int index = 0 ; index < string.length() - 1 ; index++)
 		{
 			int subString = Integer.parseInt(string.substring(index, index + 1));
-			Pattern pattern = Pattern.compile(Integer.toString(subString + 1));
+			Pattern pattern = Pattern.compile(Integer.toString(subString + 1) + Integer.toString(subString + 2));
 			Matcher matcher = pattern.matcher(string);
 			while(matcher.find()) {
 				if(matcher.start() == index + 1) {
@@ -60,7 +82,7 @@ public class PasswordTest {
 		for (int index = 0 ; index < string.length() - 1 ; index++)
 		{
 			int subString = Integer.parseInt(string.substring(index, index + 1));
-			Pattern pattern = Pattern.compile(Integer.toString(subString - 1));
+			Pattern pattern = Pattern.compile(Integer.toString(subString - 1) + Integer.toString(subString - 2));
 			Matcher matcher = pattern.matcher(string);
 			while(matcher.find()) {
 				if(matcher.start() == index + 1) {
