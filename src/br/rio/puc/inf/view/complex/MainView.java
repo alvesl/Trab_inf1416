@@ -30,7 +30,7 @@ public class MainView extends JFrame {
 	private JTextField textField;
 	private JPasswordField passwordField;
 	private String currentUser;
-	
+	private static String currentPass;
 
 	/**
 	 * Launch the application.
@@ -44,6 +44,8 @@ public class MainView extends JFrame {
 
 		// Instanciar conexão com DB
 		AccessJDBC.init();
+		
+		currentPass = new String();
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -163,16 +165,20 @@ public class MainView extends JFrame {
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				currentPass = currentPass + btnNewButton.getText();
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
 				passwordField.setText(new String(passwordField.getPassword())
-						+ " ");
+						+ " ");		
+				
 			}
+			
 		});
 
 		btnNewButton_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				currentPass = currentPass + btnNewButton_1.getText();
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
 				passwordField.setText(new String(passwordField.getPassword())
@@ -183,6 +189,7 @@ public class MainView extends JFrame {
 		btnNewButton_2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				currentPass = currentPass + btnNewButton_2.getText();
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
 				passwordField.setText(new String(passwordField.getPassword())
@@ -193,6 +200,7 @@ public class MainView extends JFrame {
 		btnNewButton_3.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				currentPass = currentPass + btnNewButton_3.getText();
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
 				passwordField.setText(new String(passwordField.getPassword())
@@ -203,6 +211,7 @@ public class MainView extends JFrame {
 		btnNewButton_4.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				currentPass = currentPass + btnNewButton_4.getText();
 				randomizeButtonArray(btnNewButton, btnNewButton_1,
 						btnNewButton_2, btnNewButton_3, btnNewButton_4);
 				passwordField.setText(new String(passwordField.getPassword())
@@ -220,6 +229,11 @@ public class MainView extends JFrame {
 					pass = "";
 				}
 				passwordField.setText(pass);
+				
+				if (currentPass.length() > 0) {
+					currentPass = currentPass.substring(0, currentPass.length()-2);
+				}
+				
 			}
 		});
 
@@ -236,29 +250,70 @@ public class MainView extends JFrame {
 							"Senha muito longa, máximo de 10 dígitos!");
 					return;
 				}
+
+				// Gerar todas as possibilidades de senhas
+
 				
-				// Senha ok, verificação de correção
+				String[] passArray = new String[(int) Math.pow(2, currentPass.length() / 2)];
+				
+				for (int j=0; j< passArray.length; j++) {
+					passArray[j] = new String();
+				}
+				
+				for (int i = 0 ; i < currentPass.length()/2 ; i++) {
+					int mustChange = (int) (passArray.length / ( Math.pow(2, i+1)  ));
+					int count = 0;
+					int toAdd = 0;
+					
+					for (int j=0; j< passArray.length; j++) {
+						if (count == mustChange) {
+							count = 0;
+							if (toAdd == 1) {
+								toAdd = 0;
+							} else
+								toAdd = 1;
+						}
+						
+						passArray[j] = passArray[j] + currentPass.charAt(2*i+toAdd); 
+								
+						count++;
+					}
+					
+					
+					
+				}
+				
+				
+				// Senha dentro dos limites, verificação de correção
 				User validUser = AccessJDBC.getUser(currentUser);
-				User toAuthUsr = new User(currentUser, null, -1, pass, null);
+				User toAuthUsr = new User(currentUser, null, -1, null, null);
 				toAuthUsr.setID(AccessJDBC.getUserID(currentUser));
 				String passToAuth = null;
+				boolean auth = false;
 				try {
-					passToAuth = User.generateDbPassword(toAuthUsr, "MD5");
+					for (int j=0; j< passArray.length; j++) {
+						toAuthUsr.setPassword(passArray[j]);
+						passToAuth = User.generateDbPassword(toAuthUsr, "MD5");
+						if (Digest.compareDigest(passToAuth, validUser.getDbPassword())) {
+							auth = true;
+							break;
+						}
+					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				if(!Digest.compareDigest(passToAuth, validUser.getDbPassword()));
-				{
-					JOptionPane.showMessageDialog(null, "Senha incorreta. Sua tentativa foi logada.");
+				if (!auth) {
+					JOptionPane.showMessageDialog(null,
+							"Senha incorreta. Sua tentativa foi logada.");
 				}
-				
-				
+
 			}
 		});
 
 	}
+	
+
 
 	public void randomizeButtonArray(final JButton btnNewButton,
 			final JButton btnNewButton_1, final JButton btnNewButton_2,

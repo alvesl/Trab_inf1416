@@ -80,7 +80,7 @@ public class User {
 		Digest digest = new Digest(algorithm);
 		
 		String temp = user.getPassword() + Integer.toString(user.getID()) + user.getUsername();
-		System.out.println(temp);
+		//System.out.println(temp);
 		
 		return digest.getDigest(temp);
 	}
