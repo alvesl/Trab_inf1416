@@ -2,6 +2,7 @@ package br.rio.puc.inf.control.instruments;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.security.Key;
@@ -43,10 +44,10 @@ public class Cryptography {
 				System.out.println("Passphrase:");
 				String passphrase = in.readLine();
 				
-				byte[] b1 = encryptPrivateKey(key.getBytes("UTF8"), passphrase);
+				byte[] b1 = encryptPrivateKeySymmetric(key.getBytes("UTF8"), passphrase);
 				System.out.println("Chave encriptada: " + toHex(b1));
 				
-				byte[] b2 = decryptPrivateKey(b1, passphrase);
+				byte[] b2 = decryptPrivateKeySymmetric(b1, passphrase);
 				System.out.println("Chave decriptada: " + new String(b2, "UTF8"));
 		}
 		catch (Exception e) {
@@ -59,15 +60,17 @@ public class Cryptography {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		
 		try {
-				System.out.println("Output file:");
-				String output = in.readLine();
+				System.out.println("Public file:");
+				String pubFile = in.readLine();
+				System.out.println("Private file:");
+				String privFile = in.readLine();
 				System.out.println("Text to be encrypted: ");
 				String text = in.readLine();
 				String algorithm = "RSA";
 				
-				genKeyPair2(output, algorithm);
-				PrivateKey privKey = getPrivateKeyFile2(output, algorithm);
-				PublicKey pubKey = getPublicKeyFile(output, algorithm);
+				genKeyPair2(pubFile, privFile, algorithm);
+				PrivateKey privKey = getPrivateKeyFile2(privFile, algorithm);
+				PublicKey pubKey = getPublicKeyFile(pubFile, algorithm);
 				
 				// Sign with private
 				Signature sig = Signature.getInstance("MD5WithRSA");
@@ -98,22 +101,19 @@ public class Cryptography {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		
 		try {
-				//System.out.println("Private key file:");
-				//String privFile = in.readLine();
-				//System.out.println("Public key file:");
-				//String pubFile = in.readLine();
-				System.out.println("Output: ");
-				String output = in.readLine();
+				System.out.println("Private File: ");
+				String privFile = in.readLine();
+				System.out.println("Public File: ");
+				String pubFile = in.readLine();
 				System.out.println("Text to be encrypted: ");
 				String text = in.readLine();
 				System.out.println("Passphrase: ");
 				String passphrase = in.readLine();
 				String algorithm = "RSA";
 				
-				//genKeyPair(output, algorithm, passphrase);
-				PublicKey pubKey = getPublicKeyFile(output, algorithm);
-				PrivateKey privKey = getPrivateKeyFile2(output, algorithm);
-				//PrivateKey privKey = getPrivateKeyFile(output, algorithm, passphrase);
+				//genKeyPairAssymmetric(pubFile, privFile, algorithm, passphrase);
+				PublicKey pubKey = getPublicKeyFile(pubFile, algorithm);
+				PrivateKey privKey = getPrivateKeyFile(privFile, algorithm, passphrase);
 
 				// Sign with private
 				Signature sig = Signature.getInstance("MD5WithRSA");
@@ -134,7 +134,10 @@ public class Cryptography {
 				
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			if(e instanceof FileNotFoundException)
+				System.out.println("File doesnt exist");
+			else
+				System.out.println("Verificação negativa");
 		}
 	}
 	
@@ -143,20 +146,8 @@ public class Cryptography {
 	 * 
 	 */
 	
-	// Encrypt Private key
-	public static byte[] encryptPrivateKey(byte[] key, String passphrase)
-	{
-		return encryptByteArray(key, "DES/ECB/PKCS5Padding", passphrase);
-	}
-	
-	// Decrypt Private key
-	public static byte[] decryptPrivateKey(byte[] encryptedKey, String passphrase)
-	{
-		return decryptByteArray(encryptedKey, "DES/ECB/PKCS5Padding", passphrase);
-	}
-	
 	// Generate pair of keys. Private key is encrypted using symmetric key
-	public static void genKeyPair(String output, String algorithm, String passphrase)
+	public static void genKeyPairAssymmetric(String pubFile, String privFile, String algorithm, String passphrase)
 	{
 		try {
 			KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm);
@@ -166,17 +157,17 @@ public class Cryptography {
 			PublicKey pubKey = keyPair.getPublic();
 			
 			// Write public key in file
-			String file = output+".pub";
+			String file = pubFile;
 		    FileOutputStream out = new FileOutputStream(file);
 		    byte[] encPubKey = pubKey.getEncoded();
 		    out.write(encPubKey);
 		    out.close();
 		    
 		    // Encrypt private key with symmetric key
-		    byte[] encPrivKey = encryptPrivateKey(privKey.getEncoded(), passphrase);
+		    byte[] encPrivKey = encryptPrivateKeySymmetric(privKey.getEncoded(), passphrase);
 		    			
 			// Write private key in file
-			file = output+".pri";
+			file = privFile;
 		    out = new FileOutputStream(file);
 		    out.write(encPrivKey);
 		    out.close();
@@ -186,138 +177,83 @@ public class Cryptography {
 		}
 	}
 	
-	// Generate pair of keys
-	public static void genKeyPair2(String output, String algorithm)
-	{
-		try {
-			KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm);
-			keyGen.initialize(512);
-			KeyPair keyPair = keyGen.generateKeyPair();
-			PrivateKey privKey = keyPair.getPrivate();
-			PublicKey pubKey = keyPair.getPublic();
-			
-			// Write private key in file
-			String file = output+".pri";
-		    FileOutputStream out = new FileOutputStream(file);
-		    byte[] encPrivKey = privKey.getEncoded();
-		    out.write(encPrivKey);
-		    out.close();
-		    
-		    file = output+".pub";
-		    out = new FileOutputStream(file);
-		    byte[] encPubKey = pubKey.getEncoded();
-		    out.write(encPubKey);
-		    out.close();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 	
 	
 	//  Get Public key from file
-	public static PublicKey getPublicKeyFile(String input, String algorithm)
+	public static PublicKey getPublicKeyFile(String inputFile, String algorithm) throws Exception
 	{
-		PublicKey pubKey = null;
-		try {
-			KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-			
-			String pubKeyFile = input +".pub";
-		    FileInputStream pubKeyStream = new FileInputStream(pubKeyFile);
-		    int pubKeyLength = pubKeyStream.available();
-		    byte[] pubKeyBytes = new byte[pubKeyLength];
-		    pubKeyStream.read(pubKeyBytes);
-		    pubKeyStream.close();
-		    X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubKeyBytes);
-		    pubKey = keyFactory.generatePublic(pubKeySpec);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return pubKey;
+		KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+		
+		String pubKeyFile = inputFile;
+	    FileInputStream pubKeyStream = new FileInputStream(pubKeyFile);
+	    int pubKeyLength = pubKeyStream.available();
+	    byte[] pubKeyBytes = new byte[pubKeyLength];
+	    pubKeyStream.read(pubKeyBytes);
+	    pubKeyStream.close();
+	    X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubKeyBytes);
+	    PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+
+	    return pubKey;
 	}
 	
-	// Get Private key from file
-	public static PrivateKey getPrivateKeyFile(String input, String algorithm, String passphrase)
+	// Get Private key from file. Private key must be encrypted by symmetric key
+	public static PrivateKey getPrivateKeyFile(String inputFile, String algorithm, String passphrase) throws Exception
 	{
-		PrivateKey privKey = null;
-		try {
-			KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-			
-			String privKeyFile = input +".pri";
-		    FileInputStream priKeyStream = new FileInputStream(privKeyFile);
-		    int priKeyLength = priKeyStream.available();
-		    byte[] encPrivKeyBytes = new byte[priKeyLength];
-		    priKeyStream.read(encPrivKeyBytes);
-		    priKeyStream.close();
-		    //byte[] privKeyBytes = decryptPrivateKey(encPrivKeyBytes, passphrase);
-		    PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encPrivKeyBytes);
-		    privKey = keyFactory.generatePrivate(privKeySpec);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return privKey;
-	}
-	
-	// Get Private key from file
-	public static PrivateKey getPrivateKeyFile2(String input, String algorithm)
-	{
-		PrivateKey privKey = null;
-		try {
-			KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-			
-			String priKeyFile = input+".pri";
-		    FileInputStream priKeyStream = new FileInputStream(priKeyFile);
-		    int priKeyLength = priKeyStream.available();
-		    byte[] priKeyBytes = new byte[priKeyLength];
-		    priKeyStream.read(priKeyBytes);
-		    priKeyStream.close();
-		    PKCS8EncodedKeySpec priKeySpec = new PKCS8EncodedKeySpec(priKeyBytes);
-		    privKey = keyFactory.generatePrivate(priKeySpec);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+		
+		String privKeyFile = inputFile;
+	    FileInputStream priKeyStream = new FileInputStream(privKeyFile);
+	    int priKeyLength = priKeyStream.available();
+	    byte[] encPrivKeyBytes = new byte[priKeyLength];
+	    priKeyStream.read(encPrivKeyBytes);
+	    priKeyStream.close();
+	    byte[] privKeyBytes = decryptPrivateKeySymmetric(encPrivKeyBytes, passphrase);
+	    PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(privKeyBytes);
+	    PrivateKey privKey = keyFactory.generatePrivate(privKeySpec);
+	    
 		return privKey;
 	}	
 	
-	// Encrypt an array of bytes
-	private static byte[] encryptByteArray(byte[] bArray, String algorithm, String seed)
+	// Encrypt Private key
+	public static byte[] encryptPrivateKeySymmetric(byte[] key, String passphrase) throws Exception
 	{
-		byte[] encryptedArray = null;
-		try {
-			Key symKey = getSymmetricKey(seed);
-			Cipher cipher = Cipher.getInstance(algorithm);
-			
-			cipher.init(Cipher.ENCRYPT_MODE, symKey);
-			encryptedArray = cipher.doFinal(bArray);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		return encryptByteArray(key, "DES/ECB/PKCS5Padding", passphrase);
+	}
+	
+	// Decrypt Private key
+	public static byte[] decryptPrivateKeySymmetric(byte[] encryptedKey, String passphrase) throws Exception
+	{
+		return decryptByteArray(encryptedKey, "DES/ECB/PKCS5Padding", passphrase);
+	}
+	
+	// Encrypt an array of bytes
+	private static byte[] encryptByteArray(byte[] bArray, String algorithm, String seed) throws Exception
+	{
+		Key symKey = getSymmetricKey(seed);
+		Cipher cipher = Cipher.getInstance(algorithm);
+		
+		cipher.init(Cipher.ENCRYPT_MODE, symKey);
+		byte[] encryptedArray = cipher.doFinal(bArray);
+		
 		return encryptedArray;
+
 	}
 	
 	// Decrypt an array of bytes
-	private static byte[] decryptByteArray(byte[] bArray, String algorithm, String seed)
+	private static byte[] decryptByteArray(byte[] bArray, String algorithm, String seed) throws Exception
 	{
-		byte[] decryptedArray = null;
-		try {
-			Key symKey = getSymmetricKey(seed);
-			Cipher cipher = Cipher.getInstance(algorithm);
-			
-			cipher.init(Cipher.DECRYPT_MODE, symKey);
-			decryptedArray = cipher.doFinal(bArray);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		Key symKey = getSymmetricKey(seed);
+		Cipher cipher = Cipher.getInstance(algorithm);
+		
+		cipher.init(Cipher.DECRYPT_MODE, symKey);
+		byte[] decryptedArray = cipher.doFinal(bArray);
+
 		return decryptedArray;
 	}
 	
 	// Sign array of bytes
-	private static byte[] signByteArray (byte[] bArray, PrivateKey privateKey)
+	private static byte[] signByteArraySymmetric (byte[] bArray, PrivateKey privateKey)
 	{
 		byte[] signedBArray = null;
 		try {
@@ -353,21 +289,16 @@ public class Cryptography {
 	}
 	
 	// Get symmetric key from passphrase
-	private static Key getSymmetricKey (String passphrase)
+	private static Key getSymmetricKey (String passphrase) throws Exception
 	{
-		Key key = null;
-		try {
-			KeyGenerator keyGen = KeyGenerator.getInstance("DES");
-			SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-			
-			random.setSeed(passphrase.getBytes("UTF8"));
-			keyGen.init(56, random);
-			
-			key = keyGen.generateKey();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		KeyGenerator keyGen = KeyGenerator.getInstance("DES");
+		SecureRandom random = new SecureRandom();
+		
+		random.setSeed(passphrase.getBytes("UTF8"));
+		keyGen.init(56, random);
+		
+		Key key = keyGen.generateKey();
+
 		return key;
 	}
 	
@@ -382,4 +313,61 @@ public class Cryptography {
 	    return buf.toString();
 	}
 
+	
+	
+	/*********************************************************
+	*
+	*Obsolete Methods 
+	*/
+	
+	// Generate pair of keys
+	private static void genKeyPair2(String outputFilePub, String outputFilePriv, String algorithm)
+	{
+		try {
+			KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm);
+			keyGen.initialize(512);
+			KeyPair keyPair = keyGen.generateKeyPair();
+			PrivateKey privKey = keyPair.getPrivate();
+			PublicKey pubKey = keyPair.getPublic();
+			
+			// Write private key in file
+			String file = outputFilePriv;
+		    FileOutputStream out = new FileOutputStream(file);
+		    byte[] encPrivKey = privKey.getEncoded();
+		    out.write(encPrivKey);
+		    out.close();
+		    
+		    // Write public key in a file
+		    file = outputFilePub;
+		    out = new FileOutputStream(file);
+		    byte[] encPubKey = pubKey.getEncoded();
+		    out.write(encPubKey);
+		    out.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Get Private key from file
+		public static PrivateKey getPrivateKeyFile2(String input, String algorithm)
+		{
+			PrivateKey privKey = null;
+			try {
+				KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+				
+				String priKeyFile = input+".pri";
+			    FileInputStream priKeyStream = new FileInputStream(priKeyFile);
+			    int priKeyLength = priKeyStream.available();
+			    byte[] priKeyBytes = new byte[priKeyLength];
+			    priKeyStream.read(priKeyBytes);
+			    priKeyStream.close();
+			    PKCS8EncodedKeySpec priKeySpec = new PKCS8EncodedKeySpec(priKeyBytes);
+			    privKey = keyFactory.generatePrivate(priKeySpec);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			return privKey;
+		}
 }
