@@ -16,6 +16,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Random;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -28,7 +29,7 @@ public class Cryptography {
 	public static void main(String[] args) {
 
 		//testSymmetricCrypto();
-		
+	
 		//testAssymmetricCrypto();
 		
 		testCombinedCrypto();
@@ -70,7 +71,7 @@ public class Cryptography {
 				
 				genKeyPair2(pubFile, privFile, algorithm);
 				PrivateKey privKey = getPrivateKeyFile2(privFile, algorithm);
-				PublicKey pubKey = getPublicKeyFile(pubFile, algorithm);
+				PublicKey pubKey = getPublicKeyFile(pubFile);
 				
 				// Sign with private
 				Signature sig = Signature.getInstance("MD5WithRSA");
@@ -105,39 +106,26 @@ public class Cryptography {
 				String privFile = in.readLine();
 				System.out.println("Public File: ");
 				String pubFile = in.readLine();
-				System.out.println("Text to be encrypted: ");
-				String text = in.readLine();
 				System.out.println("Passphrase: ");
 				String passphrase = in.readLine();
-				String algorithm = "RSA";
 				
-				//genKeyPairAssymmetric(pubFile, privFile, algorithm, passphrase);
-				PublicKey pubKey = getPublicKeyFile(pubFile, algorithm);
-				PrivateKey privKey = getPrivateKeyFile(privFile, algorithm, passphrase);
+				//genKeyPairAssymmetric(pubFile, privFile, passphrase);
+				PublicKey pubKey = getPublicKeyFile(pubFile);
+				PrivateKey privKey = getPrivateKeyFile(privFile, passphrase);
 
-				// Sign with private
-				Signature sig = Signature.getInstance("MD5WithRSA");
-			    sig.initSign(privKey);
-			    sig.update(text.getBytes("UTF8"));
-			    byte[] signature = sig.sign();
-			    
-			    // Verify with public
-			    sig.initVerify(pubKey);
-			    sig.update(text.getBytes("UTF8"));
-			    try {
-			      if (sig.verify(signature)) {
-			        System.out.println( "Signature verified" );
-			      } else System.out.println( "Signature failed" );
-			    } catch (SignatureException se) {
-			      System.out.println( "Singature failed" );
-			    }
+				// Generates random array of bytes and sign it
+				byte[] bArray = new byte[512];
+				new Random().nextBytes(bArray);
+				byte[] signature = signByteArraySymmetric(bArray, privKey);
 				
+				if (verifyDigitalSigByteArray(signature, bArray, pubKey))
+			        System.out.println( "Signature verified" );
 		}
 		catch (Exception e) {
 			if(e instanceof FileNotFoundException)
 				System.out.println("File doesnt exist");
 			else
-				System.out.println("Verificação negativa");
+				System.out.println("Signature failed");
 		}
 	}
 	
@@ -147,10 +135,10 @@ public class Cryptography {
 	 */
 	
 	// Generate pair of keys. Private key is encrypted using symmetric key
-	public static void genKeyPairAssymmetric(String pubFile, String privFile, String algorithm, String passphrase)
+	public static void genKeyPairAssymmetric(String pubFile, String privFile, String passphrase)
 	{
 		try {
-			KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm);
+			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 			keyGen.initialize(512);
 			KeyPair keyPair = keyGen.generateKeyPair();
 			PrivateKey privKey = keyPair.getPrivate();
@@ -181,9 +169,9 @@ public class Cryptography {
 	
 	
 	//  Get Public key from file
-	public static PublicKey getPublicKeyFile(String inputFile, String algorithm) throws Exception
+	public static PublicKey getPublicKeyFile(String inputFile) throws Exception
 	{
-		KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		
 		String pubKeyFile = inputFile;
 	    FileInputStream pubKeyStream = new FileInputStream(pubKeyFile);
@@ -198,9 +186,9 @@ public class Cryptography {
 	}
 	
 	// Get Private key from file. Private key must be encrypted by symmetric key
-	public static PrivateKey getPrivateKeyFile(String inputFile, String algorithm, String passphrase) throws Exception
+	public static PrivateKey getPrivateKeyFile(String inputFile, String passphrase) throws Exception
 	{
-		KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		
 		String privKeyFile = inputFile;
 	    FileInputStream priKeyStream = new FileInputStream(privKeyFile);
@@ -257,7 +245,7 @@ public class Cryptography {
 	{
 		byte[] signedBArray = null;
 		try {
-			Signature sig = Signature.getInstance("RSAwithMD5");
+			Signature sig = Signature.getInstance("MD5withRSA");
 			
 			sig.initSign(privateKey);
 			sig.update(bArray);
@@ -271,21 +259,13 @@ public class Cryptography {
 	}
 	
 	// Verify Digital signature of an array of bytes
-	private static boolean verifyDigitalSigByteArray (byte[] signature, byte[] bArray, PublicKey publicKey)
+	private static boolean verifyDigitalSigByteArray (byte[] signature, byte[] bArray, PublicKey publicKey) throws Exception
 	{
-		boolean verified = false;
-		try {
-			Signature sig = Signature.getInstance("RSAwithMD5");
-			sig.initVerify(publicKey);
-			sig.update(bArray);
-			
-			verified = sig.verify(signature);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		Signature sig = Signature.getInstance("MD5withRSA");
+		sig.initVerify(publicKey);
+		sig.update(bArray);
 		
-		return verified;
+		return sig.verify(signature);
 	}
 	
 	// Get symmetric key from passphrase
