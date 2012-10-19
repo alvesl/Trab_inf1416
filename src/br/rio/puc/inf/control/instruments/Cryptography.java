@@ -241,7 +241,7 @@ public class Cryptography {
 	}
 	
 	// Sign array of bytes
-	private static byte[] signByteArraySymmetric (byte[] bArray, PrivateKey privateKey)
+	public static byte[] signByteArraySymmetric (byte[] bArray, PrivateKey privateKey)
 	{
 		byte[] signedBArray = null;
 		try {
@@ -259,7 +259,7 @@ public class Cryptography {
 	}
 	
 	// Verify Digital signature of an array of bytes
-	private static boolean verifyDigitalSigByteArray (byte[] signature, byte[] bArray, PublicKey publicKey) throws Exception
+	public static boolean verifyDigitalSigByteArray (byte[] signature, byte[] bArray, PublicKey publicKey) throws Exception
 	{
 		Signature sig = Signature.getInstance("MD5withRSA");
 		sig.initVerify(publicKey);

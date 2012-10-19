@@ -6,6 +6,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -20,6 +24,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
+import br.rio.puc.inf.control.instruments.Cryptography;
 import br.rio.puc.inf.control.instruments.Digest;
 import br.rio.puc.inf.model.User;
 
@@ -31,6 +36,7 @@ public class MainView extends JFrame {
 	private JPasswordField passwordField;
 	private String currentUser;
 	private static String currentPass;
+	private BasicUserView userView;
 
 	/**
 	 * Launch the application.
@@ -86,7 +92,8 @@ public class MainView extends JFrame {
 		lblBemVindoAo.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		lblBemVindoAo.setBounds(119, 99, 593, 27);
 		contentPane.add(lblBemVindoAo);
-
+		
+		
 		JPanel panel = new JPanel();
 		panel.setBounds(267, 238, 190, 152);
 		panel.setVisible(false);
@@ -134,6 +141,7 @@ public class MainView extends JFrame {
 		// Inicializa todos os eventos
 		initializeEvents(panel, btnNewButton, btnNewButton_1, btnNewButton_2,
 				btnNewButton_3, btnNewButton_4, btnNewButton_5, btnOk);
+		
 
 	}
 
@@ -306,6 +314,45 @@ public class MainView extends JFrame {
 				if (!auth) {
 					JOptionPane.showMessageDialog(null,
 							"Senha incorreta. Sua tentativa foi logada.");
+				} else {
+					// Verificar a chave do usuário
+					String privateKeyFile = JOptionPane.showInputDialog(null, "Caminho para a chave privada..:", 
+							"Chave Privada", 1);
+					
+					String passPhrase = JOptionPane.showInputDialog(null, "Entre com sua passphrase para a chave privada..:", 
+							"Passphrase", 1);
+					
+					try {
+						PrivateKey privKey = Cryptography.getPrivateKeyFile(privateKeyFile, passPhrase);
+						// Generates random array of bytes and sign it
+						byte[] bArray = new byte[512];
+						new Random().nextBytes(bArray);
+						byte[] signature = Cryptography.signByteArraySymmetric(bArray, privKey);
+						
+						KeyFactory rsaKeyFac =  KeyFactory.getInstance("RSA");
+						X509EncodedKeySpec keySpec = new X509EncodedKeySpec(validUser.getPublicKey().getBytes());
+						RSAPublicKey pubKey;
+						   pubKey = (RSAPublicKey) rsaKeyFac.generatePublic(keySpec);
+						
+						if (Cryptography.verifyDigitalSigByteArray(signature, bArray, pubKey))
+							JOptionPane.showMessageDialog(null,
+									"Login realizado com sucesso!");
+						
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					
+					// Usuário foi autenticado!
+					
+					userView = new BasicUserView(currentUser);
+					setContentPane(userView);
+					revalidate();
+					repaint();
+
+
+					
 				}
 
 			}
@@ -342,5 +389,4 @@ public class MainView extends JFrame {
 
 		return;
 	}
-
 }
