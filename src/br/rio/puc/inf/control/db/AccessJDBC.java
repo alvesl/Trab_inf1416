@@ -214,6 +214,32 @@ public class AccessJDBC {
 			e.printStackTrace();
 		}
 	}
+	
+	// Get Group Name given ID
+	public static String getGroupName(int groupID)
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		String group = null;
+		
+		sqlQuery = "Select Name FROM Groups WHERE ID = " + Integer.toString(groupID);
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			rs.next();
+			group = rs.getString(1);
+			
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return group;
+	}
 
 	
 	/***********************
