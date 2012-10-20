@@ -38,6 +38,7 @@ public class MainView extends JFrame {
 	private String currentUser;
 	private static String currentPass;
 	private BasicUserView userView;
+	private JFrame frame = this;
 
 	/**
 	 * Launch the application.
@@ -348,7 +349,7 @@ public class MainView extends JFrame {
 					
 					// Usuário foi autenticado!
 					
-					userView = new BasicUserView(currentUser);
+					userView = new BasicUserView(validUser, frame);
 					setContentPane(userView);
 					revalidate();
 					repaint();
