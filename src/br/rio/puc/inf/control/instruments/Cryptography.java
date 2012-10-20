@@ -109,7 +109,7 @@ public class Cryptography {
 				System.out.println("Passphrase: ");
 				String passphrase = in.readLine();
 				
-				//genKeyPairAssymmetric(pubFile, privFile, passphrase);
+				genKeyPairAssymmetric(pubFile, privFile, passphrase);
 				PublicKey pubKey = getPublicKeyFile(pubFile);
 				PrivateKey privKey = getPrivateKeyFile(privFile, passphrase);
 

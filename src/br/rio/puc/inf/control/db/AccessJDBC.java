@@ -3,6 +3,7 @@ package br.rio.puc.inf.control.db;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -80,10 +81,15 @@ public class AccessJDBC {
 		
 		sqlInsert = "INSERT INTO Users (Full_Name, Username, Group_ID, Public_Key, Num_loged) VALUES('" + user.getFullName() + "', '" + 
 					user.getUsername() + "', '" + user.getGroupID() + "', '" + user.getPublicKey() + "', '" + user.getNumLoged() + "')";
+
+
+		
 		System.out.println(sqlInsert);
 		try {
 
 			stmt = theConn.createStatement();
+
+			
 			stmt.execute(sqlInsert);
 			
 			// Updates the Db password
@@ -120,7 +126,7 @@ public class AccessJDBC {
 			fullName = rs.getString(2);
 			groupID = rs.getInt(4);
 			dbPassword = rs.getString(5);
-			publicKey = rs.getString(6);
+			publicKey = rs.getString(6) ;
 			numLoged = rs.getInt(7);
 			
 			rs.close();

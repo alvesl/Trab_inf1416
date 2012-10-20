@@ -19,7 +19,7 @@ public class BasicUserView extends JPanel {
 		
 		JLabel lblBemVindoUser = new JLabel("Bem vindo "+currentUser+"!");
 		lblBemVindoUser.setFont(new Font("Tahoma", Font.PLAIN, 17));
-		lblBemVindoUser.setBounds(264, 11, 227, 21);
+		lblBemVindoUser.setBounds(287, 11, 268, 21);
 		add(lblBemVindoUser);
 
 	}

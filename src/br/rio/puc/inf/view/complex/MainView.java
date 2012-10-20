@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import sun.misc.BASE64Decoder;
 import br.rio.puc.inf.control.db.AccessJDBC;
 import br.rio.puc.inf.control.instruments.Cryptography;
 import br.rio.puc.inf.control.instruments.Digest;
@@ -330,7 +331,8 @@ public class MainView extends JFrame {
 						byte[] signature = Cryptography.signByteArraySymmetric(bArray, privKey);
 						
 						KeyFactory rsaKeyFac =  KeyFactory.getInstance("RSA");
-						X509EncodedKeySpec keySpec = new X509EncodedKeySpec(validUser.getPublicKey().getBytes());
+						byte[] decodedBytes = new BASE64Decoder().decodeBuffer(validUser.getPublicKey()); //Recupera os array de bytes da string do DB
+						X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedBytes);
 						RSAPublicKey pubKey;
 						   pubKey = (RSAPublicKey) rsaKeyFac.generatePublic(keySpec);
 						

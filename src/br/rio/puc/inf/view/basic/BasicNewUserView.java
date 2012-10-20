@@ -3,8 +3,11 @@ package br.rio.puc.inf.view.basic;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.PublicKey;
 
+import sun.misc.BASE64Encoder;
 import br.rio.puc.inf.control.db.AccessJDBC;
+import br.rio.puc.inf.control.instruments.Cryptography;
 import br.rio.puc.inf.control.instruments.Digest;
 import br.rio.puc.inf.control.instruments.PasswordTest;
 import br.rio.puc.inf.model.User;
@@ -50,12 +53,25 @@ public class BasicNewUserView {
 			
 			System.out.print("Chave Publica:");
 			publicKey = in.readLine();
+
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  
 		
-		User user = new User(username, fullName, groupID, passwd, publicKey);
+		
+		PublicKey pubKey = null;
+		try {
+			pubKey = Cryptography.getPublicKeyFile(publicKey);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		byte[] keyBytes = pubKey.getEncoded();
+		String encodedBytes = new BASE64Encoder().encode(keyBytes);
+		
+		User user = new User(username, fullName, groupID, passwd, encodedBytes );
 		
 		// Insert user in DB
 		AccessJDBC.insertUser(user);
