@@ -1,19 +1,17 @@
 package br.rio.puc.inf.view.complex;
 
-import java.awt.Component;
+import java.awt.SystemColor;
 
-import javax.swing.Box;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
 import br.rio.puc.inf.model.User;
-import javax.swing.JDesktopPane;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.SystemColor;
+
 
 public class BasicUserView extends JPanel {
 

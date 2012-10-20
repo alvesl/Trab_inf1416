@@ -9,6 +9,7 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -165,8 +166,30 @@ public class Cryptography {
 		}
 	}
 	
+	// Generate DES key using seed
+	public static Key generateDESKey(byte[] seed) throws NoSuchAlgorithmException {
+		SecureRandom random = new SecureRandom(seed);
+		
+		KeyGenerator keyGen = KeyGenerator.getInstance("DES");
+		keyGen.init(56, random);
+
+		Key key = keyGen.generateKey();
+		
+		return key;
+	}
 	
-	
+	// Get encrypted file
+	public static byte[] getEncFile(String inputFile) throws Exception {
+
+		String encyptedFile = inputFile;
+	    FileInputStream encyptedFileStream = new FileInputStream(encyptedFile);
+	    int encyptedFileLength = encyptedFileStream.available();
+	    byte[] pubKeyBytes = new byte[encyptedFileLength];
+	    encyptedFileStream.read(pubKeyBytes);
+	    encyptedFileStream.close();
+		
+		return pubKeyBytes;
+	}
 	
 	//  Get Public key from file
 	public static PublicKey getPublicKeyFile(String inputFile) throws Exception
@@ -293,6 +316,9 @@ public class Cryptography {
 	    return buf.toString();
 	}
 
+	
+	
+	
 	
 	
 	/*********************************************************
