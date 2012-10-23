@@ -47,8 +47,9 @@ public class AdminCreateView extends JPanel {
 		lblTotalDeUsurios.setBounds(247, 26, 147, 14);
 		add(lblTotalDeUsurios);
 		
-		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setBounds(429, 26, 46, 14);
+		int num = AccessJDBC.getNumRegisteredUsers();
+		JLabel lblNewLabel = new JLabel(Integer.toString(num) + " usu\u00E1rios");
+		lblNewLabel.setBounds(393, 26, 108, 14);
 		add(lblNewLabel);
 		
 		JLabel lblNomeDeUsurio = new JLabel("Nome de usu\u00E1rio:");

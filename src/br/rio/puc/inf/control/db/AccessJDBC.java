@@ -238,6 +238,34 @@ public class AccessJDBC {
 		}
 		return group;
 	}
+	
+	// Get Group Name given ID
+	public static int getNumRegisteredUsers()
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		int num = -1;
+		
+		sqlQuery = "SELECT COUNT(*) FROM Users";
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			rs.next();
+			num = rs.getInt(1);
+			
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return num;
+	}
+	
+	
 
 	
 	/***********************

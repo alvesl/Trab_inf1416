@@ -35,7 +35,7 @@ public class BasicMenuView extends JPanel {
 		JLabel lbLogin = new JLabel("Login: " + user.getUsername());
 		lbLogin.setBounds(349, 11, 87, 14);
 		JLabel lbGroup = new JLabel("Grupo: " + AccessJDBC.getGroupName(user.getGroupID()));
-		lbGroup.setBounds(349, 39, 91, 14);
+		lbGroup.setBounds(349, 39, 149, 14);
 		JLabel lbDescription = new JLabel("Nome: " + user.getFullName());
 		lbDescription.setBounds(349, 64, 89, 14);
 		setLayout(null);
