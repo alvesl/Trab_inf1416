@@ -140,7 +140,7 @@ public class AdminEditMenu extends JPanel {
 				}
 				
 				if (error.isEmpty()) {
-					// Cadastro com sucesso, update no banco!
+					// Recadastro com sucesso, update no banco!
 					byte[] keyBytes = pubKey.getEncoded();
 					String encodedBytes = new BASE64Encoder().encode(keyBytes);
 					
