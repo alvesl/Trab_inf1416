@@ -40,7 +40,7 @@ public class PasswordTest {
 	}
 	
 	// Test to find character repetitions within string
-	private static boolean findRepetition(String string)
+	public static boolean findRepetition(String string)
 	{
 		
 		for (int index = 0 ; index < string.length() - 1 ; index++)
@@ -51,7 +51,7 @@ public class PasswordTest {
 			Matcher matcher = pattern.matcher(string);
 			while(matcher.find()) {
 				if(matcher.start() == index ) {
-					System.out.println("Caracter repetido");
+					//System.out.println("Caracter repetido");
 					return true;
 				}	
 			}
@@ -63,7 +63,7 @@ public class PasswordTest {
 	}
 	
 	// Test to find sequences of numbers
-	private static boolean findSequence(String string)
+	public static boolean findSequence(String string)
 	{
 		for (int index = 0 ; index < string.length() - 1 ; index++)
 		{
@@ -72,7 +72,7 @@ public class PasswordTest {
 			Matcher matcher = pattern.matcher(string);
 			while(matcher.find()) {
 				if(matcher.start() == index + 1) {
-					System.out.println("Sequencia crescente encontrada");
+					//System.out.println("Sequencia crescente encontrada");
 					return true;
 				}	
 			}
@@ -86,7 +86,7 @@ public class PasswordTest {
 			Matcher matcher = pattern.matcher(string);
 			while(matcher.find()) {
 				if(matcher.start() == index + 1) {
-					System.out.println("Sequencia decrescente encontrada");
+					//System.out.println("Sequencia decrescente encontrada");
 					return true;
 				}	
 			}
@@ -97,11 +97,11 @@ public class PasswordTest {
 	}
 	
 	// Test string length
-	private static boolean testLenght(String string)
+	public static boolean testLenght(String string)
 	{
 		if(string.length() >= 8 && string.length() <= 10)
 			return true;
-		System.out.println("Senha deve ter entre 8 e 10 caracteres");
+		//System.out.println("Senha deve ter entre 8 e 10 caracteres");
 		return false;
 	}
 

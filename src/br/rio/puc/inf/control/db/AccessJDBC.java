@@ -83,8 +83,6 @@ public class AccessJDBC {
 					user.getUsername() + "', '" + user.getGroupID() + "', '" + user.getPublicKey() + "', '" + user.getNumLoged() + "')";
 
 
-		
-		System.out.println(sqlInsert);
 		try {
 
 			stmt = theConn.createStatement();

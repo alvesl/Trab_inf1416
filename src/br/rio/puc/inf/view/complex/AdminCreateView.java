@@ -3,15 +3,22 @@ package br.rio.puc.inf.view.complex;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.PublicKey;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import sun.misc.BASE64Encoder;
+
+import br.rio.puc.inf.control.db.AccessJDBC;
+import br.rio.puc.inf.control.instruments.Cryptography;
+import br.rio.puc.inf.control.instruments.PasswordTest;
 import br.rio.puc.inf.model.User;
 
 public class AdminCreateView extends JPanel {
@@ -26,6 +33,7 @@ public class AdminCreateView extends JPanel {
 	private final String EDIT = "To edit a user";
 	private final String LIST = "To list all user files";
 	private User currentUser = null;
+	private JComboBox comboBox;
 
 	/**
 	 * Create the panel.
@@ -90,12 +98,88 @@ public class AdminCreateView extends JPanel {
 		passwordField_1.setBounds(324, 220, 272, 20);
 		add(passwordField_1);
 		
-		JComboBox comboBox = new JComboBox();
+		comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"0 - Adminstrador", "1 - Usu\u00E1rio"}));
 		comboBox.setBounds(215, 152, 381, 20);
 		add(comboBox);
 		
 		JButton btnCadastrar = new JButton("Cadastrar");
+		btnCadastrar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				//Recuperar informações preenchidas
+				
+				String username = textField_2.getText();
+				
+				Integer group = comboBox.getSelectedIndex();
+				
+				String fullName = textField.getText();
+				
+				String passwd = new String (passwordField.getPassword());
+				
+				String passwdCheck = new String (passwordField_1.getPassword());
+				
+				String publicKey = textField_1.getText();
+				
+				String error = new String();
+				
+				// Compor mensagens de erro
+				
+				if (username.isEmpty() || fullName.isEmpty() || passwd.isEmpty() || publicKey.isEmpty() )
+					error = error + "Não são aceitos campos vazios.\n";
+				
+				// Verificar se já existe usuário
+				if (AccessJDBC.VerifyUser(username)) {
+					error = error + "Nome de usuário já existe.\n";
+					
+				}
+				
+				if (!passwd.equals(passwdCheck)) {
+					error = error + "Senha e confirmação de senha não coincidem.\n";
+				}
+				
+				if (PasswordTest.findRepetition(passwd)) {
+					error = error + "Repetição na senha encontrada, favor alterar.\n";
+				}
+				
+				if (PasswordTest.findSequence(passwd)) {
+					error = error + "Sequência na senha encontrada, favor alterar.\n";
+				}
+				
+				if (!PasswordTest.testLenght(passwd)) {
+					error = error + "Senha deve ter no mínimo 8 e no máximo 10 caracteres.\n";
+				}
+				
+				PublicKey pubKey = null;
+				try {
+					pubKey = Cryptography.getPublicKeyFile(publicKey);
+				} catch (Exception e1) {
+					error = error + "Chave publica não encontrada.\n";
+				}
+				
+				
+				
+				if (error.isEmpty()) {
+					// Cadastro com sucesso, inserir no banco!
+					byte[] keyBytes = pubKey.getEncoded();
+					String encodedBytes = new BASE64Encoder().encode(keyBytes);
+					
+					User user = new User(username, fullName, group, passwd, encodedBytes );
+					// Insert user in DB
+					AccessJDBC.insertUser(user);
+					
+					// Limpar a tela
+					clearView();
+										
+					
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"Um ou mais problemas foram encontrados, cadastro não realizado!\n" + error);
+				}
+				
+				
+			}
+		});
 		btnCadastrar.setBounds(557, 305, 89, 23);
 		add(btnCadastrar);
 		
@@ -121,5 +205,19 @@ public class AdminCreateView extends JPanel {
 		btnVoltar.setBounds(656, 305, 89, 23);
 		add(btnVoltar);
 
+	}
+	
+	private void clearView() {
+		// Limpa a tela de cadastro após um sucesso
+		
+		textField.setText("");
+		comboBox.setSelectedIndex(0);
+		textField_1.setText("");
+		textField_2.setText("");
+		passwordField.setText("");
+		passwordField_1.setText("");
+		
+		
+		
 	}
 }
