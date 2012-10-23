@@ -37,7 +37,7 @@ public class MainView extends JFrame {
 	private JPasswordField passwordField;
 	private String currentUser;
 	private static String currentPass;
-	private BasicUserView userView;
+	private BasicMenuView userView;
 	private JFrame frame = this;
 
 	/**
@@ -349,7 +349,7 @@ public class MainView extends JFrame {
 					
 					// Usuário foi autenticado!
 					
-					userView = new BasicUserView(validUser, frame);
+					userView = new BasicMenuView(validUser, frame);
 					setContentPane(userView);
 					revalidate();
 					repaint();
