@@ -326,6 +326,7 @@ public class MainView extends JFrame {
 					
 					try {
 						PrivateKey privKey = Cryptography.getPrivateKeyFile(privateKeyFile, passPhrase);
+						validUser.setPkey(privKey);
 						// Generates random array of bytes and sign it
 						byte[] bArray = new byte[512];
 						new Random().nextBytes(bArray);

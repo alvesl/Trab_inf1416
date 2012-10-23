@@ -1,20 +1,26 @@
 package br.rio.puc.inf.view.complex;
 
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.security.Key;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 
+import javax.crypto.Cipher;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 
+import br.rio.puc.inf.control.instruments.Cryptography;
 import br.rio.puc.inf.model.User;
 
 public class AdminListFiles extends JPanel {
@@ -30,15 +36,16 @@ public class AdminListFiles extends JPanel {
 	private User currentUser = null;
 	private static ArrayList<File> encFiles = new ArrayList<File>();
 	private JTable table;
+	private JTable table_1;
 	
 	
 	/**
 	 * Create the panel.
 	 */
-	public AdminListFiles(final JPanel parentPanel,final CardLayout cl, User user) {
-		setLayout(null);
+	public AdminListFiles(final JPanel parentPanel,final CardLayout cl, final User user) {
 		
 		currentUser = user;
+		setLayout(null);
 		
 		JLabel lblTotalDeConsultas = new JLabel("Total de consultas do usu\u00E1rio:");
 		lblTotalDeConsultas.setBounds(282, 11, 150, 14);
@@ -51,6 +58,7 @@ public class AdminListFiles extends JPanel {
 		
 	
 		JButton btnVoltar = new JButton("Voltar");
+		btnVoltar.setBounds(652, 305, 89, 23);
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (currentUser.getGroupID() == 0) {
@@ -67,16 +75,10 @@ public class AdminListFiles extends JPanel {
 				}
 			}
 		});
-		btnVoltar.setBounds(652, 305, 89, 23);
 		add(btnVoltar);
 		
-		
-		DefaultTableModel model = new DefaultTableModel() {
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = -5266993133307624457L;
+		DefaultTableModel model = new DefaultTableModel() {
 
 			@Override
 		    public boolean isCellEditable(int row, int column) {
@@ -85,13 +87,69 @@ public class AdminListFiles extends JPanel {
 		    }
 		};
 		
+		model.addColumn("Arquivo");
+		model.addColumn("HEX Assinatura Digital");
+		model.addColumn("HEX Envelope Digital");
+		
 		readFiles(model);
 		
 		
 		table = new JTable(model);
 		table.setBounds(10, 53, 765, 227);
+
 		add(table);
 		
+		   table.addMouseListener(new MouseAdapter() {
+
+		        @Override
+		        public void mouseClicked(MouseEvent e) {
+
+		            int row = table.rowAtPoint(e.getPoint());
+		            int col = table.columnAtPoint(e.getPoint());
+
+		            Object selectedObj = table.getValueAt(row, col);
+		            if (col == 0) {
+		            	// Realizar rotina de decriptação
+		            	
+		            	String privFile = (String) selectedObj;
+		            	privFile = privFile.substring(0, privFile.length()-4); 
+		            	
+		    			try {
+							byte[] envelopeBytes = Cryptography.getEncFile(privFile + ".env");
+							byte[] encFileBytes = Cryptography.getEncFile(privFile + ".enc");
+							
+			    			// Decriptar o envelope digital
+			    			Cipher cipher;
+
+							cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+			    			PrivateKey privKey = user.getPkey();
+			    			cipher.init(Cipher.DECRYPT_MODE, privKey);
+							
+			    			byte[] decryptedEnvelope = cipher.doFinal(envelopeBytes);
+			    			
+			    			// gerar chave DES utilizando a semente do envelope
+			    			Key key = Cryptography.generateDESKey(decryptedEnvelope);
+			    			Cipher cipherB= Cipher.getInstance("DES/ECB/PKCS5Padding");
+			    			cipherB.init(Cipher.DECRYPT_MODE, key);
+			    			
+			    			// Descriptar o arquivo codificado
+			    			byte[] decFileBytes = cipherB.doFinal(encFileBytes);
+			    			
+			    			FileOutputStream fos = new FileOutputStream((String) privFile);
+			    			fos.write(decFileBytes);
+			    			fos.close();
+			    			
+			    			
+						} catch (Exception e1) {
+							JOptionPane.showMessageDialog(null,
+									"Erro, verifique se algum arquivo está faltando ou corrompido!");
+							return;
+						}
+		    			
+		            	
+		            }
+		        }
+		    });
 
 
 	}

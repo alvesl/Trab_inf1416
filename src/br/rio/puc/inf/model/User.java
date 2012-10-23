@@ -1,5 +1,7 @@
 package br.rio.puc.inf.model;
 
+import java.security.PrivateKey;
+
 import br.rio.puc.inf.control.instruments.Digest;
 
 public class User {
@@ -21,6 +23,8 @@ public class User {
 	
 	// Number of times user loged in the system
 	private Integer numLoged;
+	
+	private PrivateKey pkey;
 	
 	/***********
 	 * Public Constructors
@@ -136,6 +140,14 @@ public class User {
 	}
 	public void setNumLoged(Integer numLoged) {
 		this.numLoged = numLoged;
+	}
+
+	public PrivateKey getPkey() {
+		return pkey;
+	}
+
+	public void setPkey(PrivateKey pkey) {
+		this.pkey = pkey;
 	}
 
 	
