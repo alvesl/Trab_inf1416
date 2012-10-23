@@ -3,13 +3,20 @@ package br.rio.puc.inf.view.complex;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.PublicKey;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import sun.misc.BASE64Encoder;
+
+import br.rio.puc.inf.control.db.AccessJDBC;
+import br.rio.puc.inf.control.instruments.Cryptography;
+import br.rio.puc.inf.control.instruments.PasswordTest;
 import br.rio.puc.inf.model.User;
 
 public class AdminEditMenu extends JPanel {
@@ -90,9 +97,95 @@ public class AdminEditMenu extends JPanel {
 		add(btnVoltar);
 		
 		JButton btnAlterar = new JButton("Alterar");
+		btnAlterar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				//Recuperar informações preenchidas
+				
+				
+				String passwd = new String (passwordField.getPassword());
+				
+				String passwdCheck = new String (passwordField_1.getPassword());
+				
+				String publicKey = textField.getText();
+				
+				String error = new String();
+				
+				// Compor mensagens de erro
+				
+				if ( passwd.isEmpty() || publicKey.isEmpty() )
+					error = error + "Não são aceitos campos vazios.\n";
+				
+				if (!passwd.equals(passwdCheck)) {
+					error = error + "Senha e confirmação de senha não coincidem.\n";
+				}
+				
+				if (PasswordTest.findRepetition(passwd)) {
+					error = error + "Repetição na senha encontrada, favor alterar.\n";
+				}
+				
+				if (PasswordTest.findSequence(passwd)) {
+					error = error + "Sequência na senha encontrada, favor alterar.\n";
+				}
+				
+				if (!PasswordTest.testLenght(passwd)) {
+					error = error + "Senha deve ter no mínimo 8 e no máximo 10 caracteres.\n";
+				}
+				
+				PublicKey pubKey = null;
+				try {
+					pubKey = Cryptography.getPublicKeyFile(publicKey);
+				} catch (Exception e1) {
+					error = error + "Chave publica não encontrada.\n";
+				}
+				
+				if (error.isEmpty()) {
+					// Cadastro com sucesso, update no banco!
+					byte[] keyBytes = pubKey.getEncoded();
+					String encodedBytes = new BASE64Encoder().encode(keyBytes);
+					
+					// REALIZAR UPDATE
+					
+					// Limpar a tela
+					clearView();
+										
+					// Retornar a tela principal
+					if (currentUser.getGroupID() == 0) {
+						//User is adm group
+						
+						cl.show(parentPanel, ADMINMENU);
+						
+					} else if (currentUser.getGroupID() == 1) {
+						//User is user group
+						
+						cl.show(parentPanel, USRMENU);
+
+						
+					}
+					
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"Um ou mais problemas foram encontrados, cadastro não realizado!\n" + error);
+				}
+				
+				
+				
+			}
+		});
 		btnAlterar.setBounds(557, 305, 89, 23);
 		add(btnAlterar);
 
+	}
+	
+	private void clearView() {
+		// Limpa a tela de cadastro após um sucesso
+		
+		textField.setText("");
+		passwordField.setText("");
+		passwordField_1.setText("");
+		
+		
+		
 	}
 
 }
