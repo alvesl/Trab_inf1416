@@ -54,7 +54,7 @@ public class ExitView extends JPanel {
 		btnSair = new JButton("Sair");
 		btnSair.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Log.registerMessage(9902, currentUser.getUsername()); // LOG: Botão sair pressionado por <login_name>
+				Log.registerMessage(9002, currentUser.getUsername()); // LOG: Botão sair pressionado por <login_name>
 				frame.dispose();
 				Log.registerMessage(1002, null); // LOG: Sistema encerrado
 			}

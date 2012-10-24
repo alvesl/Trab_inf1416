@@ -319,6 +319,32 @@ public class AccessJDBC {
 		}
 	}
 	
+	// Insert log message in DB
+	public static void registerMessage(int ID, String username, String filename)
+	{
+		PreparedStatement stmt = null;
+		String sqlInsert;
+		Date currentDatetime = new Date(System.currentTimeMillis());
+		java.sql.Timestamp timestamp = new java.sql.Timestamp(currentDatetime.getTime()); 
+        
+		sqlInsert = "INSERT INTO Registries (Message_ID, Time_inserted, Username, Filename) VALUES(" + Integer.toString(ID) + ", " + 
+					"?, '" + username + "', '" + filename +"')";
+		
+		try {
+
+			stmt = theConn.prepareStatement(sqlInsert);
+			stmt.setTimestamp(1, timestamp);
+
+			
+			stmt.execute();
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static boolean verifyUserBlocked(String username)
 	{
 		// TODO
@@ -405,12 +431,13 @@ public class AccessJDBC {
 		java.sql.Timestamp date = null;
 		String username = null;
 		String message = null;
+		String filename = null;
 		List<String> array = new ArrayList<>();
 		
 		
-		sqlQuery = "SELECT Registries.Time_inserted, Registries.Username, Messages.Message FROM Registries INNER JOIN Messages " +
-				"ON Registries.Message_ID = Messages.ID ";// +
-				//"ORDER BY Registries.Time_inserted ASC";
+		sqlQuery = "SELECT Registries.ID, Registries.Time_inserted, Registries.Username, Messages.Message, Registries.Filename FROM Registries INNER JOIN Messages " +
+				"ON Registries.Message_ID = Messages.ID " + 
+				"ORDER BY Registries.ID ASC";
 		try {
 
 			stmt = theConn.createStatement();
@@ -419,13 +446,22 @@ public class AccessJDBC {
 			while(rs.next())
 			{
 				String str;
-				date = rs.getTimestamp(1);
-				username = rs.getString(2);
-				message = rs.getString(3);
+				date = rs.getTimestamp(2);
+				username = rs.getString(3);
+				message = rs.getString(4);
+				filename = rs.getString(5);
 				if(username != null)
-					str = date.toString() + ": " + message.replace("<login_name>", username) + "\n";
+				{
+					String temp = message.replace("<login_name>", username);
+					if(filename != null)
+					{
+						str = date.toString() + ": " + temp.replace("<arq_name>", filename);
+					}
+					else
+						str = date.toString() + ": " + temp;
+				}
 				else
-					str = date.toString() + ": " + message + "\n";
+					str = date.toString() + ": " + message;
 				array.add(str);
 			}
 			

@@ -24,6 +24,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import sun.misc.BASE64Decoder;
+import br.rio.puc.inf.control.db.AccessJDBC;
 import br.rio.puc.inf.control.instruments.Cryptography;
 import br.rio.puc.inf.control.instruments.Log;
 import br.rio.puc.inf.model.User;
@@ -115,6 +116,7 @@ public class AdminListFiles extends JPanel {
 		            	// Realizar rotina de decriptação
 		            	
 		            	String privFile = (String) selectedObj;
+		            	AccessJDBC.registerMessage(8003, currentUser.getUsername(), privFile.replace(".", "-f")); // LOG: Arquivo <arq_name> selecionado por <login_name> para decriptação
 		            	privFile = privFile.substring(0, privFile.length()-4); 
 		            	
 		    			try {

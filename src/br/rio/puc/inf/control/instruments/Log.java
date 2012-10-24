@@ -22,7 +22,8 @@ public class Log {
 			Iterator iter = list.iterator();
 			while(iter.hasNext())
 			{
-				out.write((String)iter.next());
+				String temp = (String)iter.next();
+				out.write(temp);
 				out.newLine();
 			}
 			out.close();
@@ -36,6 +37,11 @@ public class Log {
 	public static void registerMessage(int ID, String username)
 	{
 		AccessJDBC.registerMessage(ID, username);
+	}
+	
+	public static void registerMessage(int ID, String username, String filename)
+	{
+		AccessJDBC.registerMessage(ID, username, filename);
 	}
 	
 	
