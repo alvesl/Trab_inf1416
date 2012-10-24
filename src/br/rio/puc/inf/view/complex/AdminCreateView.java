@@ -35,6 +35,7 @@ public class AdminCreateView extends JPanel {
 	private final String LIST = "To list all user files";
 	private User currentUser = null;
 	private JComboBox comboBox;
+	private JLabel lblNewLabel;
 
 	/**
 	 * Create the panel.
@@ -49,7 +50,7 @@ public class AdminCreateView extends JPanel {
 		add(lblTotalDeUsurios);
 		
 		int num = AccessJDBC.getNumRegisteredUsers();
-		JLabel lblNewLabel = new JLabel(Integer.toString(num) + " usu\u00E1rios");
+		lblNewLabel = new JLabel(Integer.toString(num) + " usu\u00E1rios");
 		lblNewLabel.setBounds(393, 26, 108, 14);
 		add(lblNewLabel);
 		
@@ -137,20 +138,27 @@ public class AdminCreateView extends JPanel {
 					
 				}
 				
-				if (!passwd.equals(passwdCheck)) {
-					error = error + "Senha e confirmação de senha não coincidem.\n";
+				try {
+					Integer.parseInt(passwd);
+					
+					if (!passwd.equals(passwdCheck)) {
+						error = error + "Senha e confirmação de senha não coincidem.\n";
+					}
+					
+					if (PasswordTest.findRepetition(passwd)) {
+						error = error + "Repetição na senha encontrada, favor alterar.\n";
+					}
+					
+					if (PasswordTest.findSequence(passwd)) {
+						error = error + "Sequência na senha encontrada, favor alterar.\n";
+					}
+					
+					if (!PasswordTest.testLenght(passwd)) {
+						error = error + "Senha deve ter no mínimo 8 e no máximo 10 caracteres.\n";
+					}
 				}
-				
-				if (PasswordTest.findRepetition(passwd)) {
-					error = error + "Repetição na senha encontrada, favor alterar.\n";
-				}
-				
-				if (PasswordTest.findSequence(passwd)) {
-					error = error + "Sequência na senha encontrada, favor alterar.\n";
-				}
-				
-				if (!PasswordTest.testLenght(passwd)) {
-					error = error + "Senha deve ter no mínimo 8 e no máximo 10 caracteres.\n";
+				catch (Exception exp) {
+					error = error + "Formato inválido. Senha só pode ser formada por números.\n";
 				}
 				
 				PublicKey pubKey = null;
@@ -170,6 +178,9 @@ public class AdminCreateView extends JPanel {
 					User user = new User(username, fullName, group, passwd, encodedBytes );
 					// Insert user in DB
 					AccessJDBC.insertUser(user);
+					
+					int num = AccessJDBC.getNumRegisteredUsers();
+					lblNewLabel.setText(Integer.toString(num) + " usu\u00E1rios");
 					
 					// Limpar a tela
 					clearView();

@@ -170,7 +170,6 @@ public class MainView extends JFrame {
 					if (AccessJDBC.VerifyUser(username)) {
 						validUser = AccessJDBC.getUser(username);
 						currentUser = validUser.getUsername();
-						System.out.println(currentUser);
 						
 						Date currentDatetime = new Date(System.currentTimeMillis());
 						java.sql.Timestamp timestamp = new java.sql.Timestamp(currentDatetime.getTime()); 

@@ -181,7 +181,7 @@ public class AdminListFiles extends JPanel {
 			    			
 						} catch (Exception e1) {
 							JOptionPane.showMessageDialog(null,
-									"Erro, verifique se algum arquivo está faltando ou corrompido!");
+									"Erro, verifique se o arquivo é seu. Caso seja, ele está corrompido!");
 							AccessJDBC.registerMessage(8006, currentUser.getUsername(), privFile); // LOG: erro decriptacao
 							return;
 						}
