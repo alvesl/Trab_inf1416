@@ -356,7 +356,8 @@ public class MainView extends JFrame {
 								"Senha incorreta. Usuário bloqueado.");
 						Log.registerMessage(3007, currentUser); // LOG: Terceiro erro da senha pessoal contabilizado para <login_name>
 						Log.registerMessage(3008, currentUser); // LOG: Acesso do usuario <login_name> bloqueado pela autenticação etapa 2
-						panel.setVisible(false);
+						panel.setVisible(false);	
+						passwordField.setText("");
 					}
 				} 
 				else {
