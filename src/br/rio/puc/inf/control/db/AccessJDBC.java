@@ -187,8 +187,8 @@ public class AccessJDBC {
 		return ID;
 	}
 	
-	// Insert the Database user password, which is HEX(HASH_MD5(password + ID + username))
-	private static void updateDbPasswd(User user)
+	// Update the Database user password, which is HEX(HASH_MD5(password + ID + username))
+	public static void updateDbPasswd(User user)
 	{
 		Statement stmt = null;
 		String sqlUpdate;
@@ -201,6 +201,25 @@ public class AccessJDBC {
 		}
 		
 		sqlUpdate = "UPDATE Users SET Password = '"+ user.getDbPassword() + "' WHERE ID = " + user.getID() + "";
+		try {
+
+			stmt = theConn.createStatement();
+			stmt.executeUpdate(sqlUpdate);
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Update the Database user public key
+	public static void updatePublicKey(User user)
+	{
+		Statement stmt = null;
+		String sqlUpdate;
+		
+		sqlUpdate = "UPDATE Users SET Public_key = '" + user.getPublicKey() + "' WHERE ID = " + user.getID() + "";
 		try {
 
 			stmt = theConn.createStatement();
