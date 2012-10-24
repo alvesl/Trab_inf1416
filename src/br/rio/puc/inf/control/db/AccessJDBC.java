@@ -303,8 +303,9 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 						
-			rs.next();
-			time = rs.getTimestamp(1);
+
+			if (rs.next())
+				time = rs.getTimestamp(1);
 			
 			stmt.close();
 		} 

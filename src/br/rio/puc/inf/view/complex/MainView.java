@@ -10,6 +10,8 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -166,7 +168,14 @@ public class MainView extends JFrame {
 				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
 					if (AccessJDBC.VerifyUser(username)) {
 						
-						if(!AccessJDBC.verifyUserBlocked(username)) {
+						Date currentDatetime = new Date(System.currentTimeMillis());
+						java.sql.Timestamp timestamp = new java.sql.Timestamp(currentDatetime.getTime()); 
+						
+						Timestamp lastBlock = AccessJDBC.getLastBlockByUser(username);
+						
+						
+						if ((lastBlock == null) || (timestamp.getTime() - lastBlock.getTime() > 120000)) {
+							loginAttempts = 0;
 							Log.registerMessage(2003, username); // LOG: Login name <login_name> identificado com acesso liberado.
 							Log.registerMessage(2002, null); // LOG: Autenticação etapa 1 encerrada
 							panel.setVisible(true);
@@ -329,18 +338,25 @@ public class MainView extends JFrame {
 				}
 				
 				if (!auth) {
-					JOptionPane.showMessageDialog(null,
-							"Senha incorreta. Sua tentativa foi logada.");
 					Log.registerMessage(3004, currentUser); // LOG: Senha pessoal verificada negativamente para <login_name>
 					loginAttempts ++;
-					if(loginAttempts == 1)
+					if(loginAttempts == 1) {
 						Log.registerMessage(3005, currentUser); // LOG: Primeiro erro da senha pessoal contabilizado para <login_name>
-					if(loginAttempts == 2)
+						JOptionPane.showMessageDialog(null,
+								"Senha incorreta. Sua tentativa foi logada.");
+					}
+						
+					if(loginAttempts == 2) {
 						Log.registerMessage(3006, currentUser); // LOG: Segundo erro da senha pessoal contabilizado para <login_name>
+						JOptionPane.showMessageDialog(null,
+								"Senha incorreta. Sua tentativa foi logada.");
+					}
 					if(loginAttempts == 3) {
+						JOptionPane.showMessageDialog(null,
+								"Senha incorreta. Usuário bloqueado.");
 						Log.registerMessage(3007, currentUser); // LOG: Terceiro erro da senha pessoal contabilizado para <login_name>
 						Log.registerMessage(3008, currentUser); // LOG: Acesso do usuario <login_name> bloqueado pela autenticação etapa 2
-						blockUser(validUser);
+						panel.setVisible(false);
 					}
 				} 
 				else {
@@ -390,16 +406,20 @@ public class MainView extends JFrame {
 						} 
 						catch (Exception e) {
 							loginAttempts++;
-							if(loginAttempts == 1)
+							if(loginAttempts == 1) {
 								Log.registerMessage(4004, currentUser); // LOG: Primeiro erro da chave privada contabilizado para <login_name>
-							if(loginAttempts == 2)
-								Log.registerMessage(4005, currentUser); // LOG: Segundo erro da chave privada contabilizado para <login_name>
-							if(loginAttempts == 3) {
-								Log.registerMessage(4006, currentUser); // LOG: Terceiro erro da chave privada contabilizado para <login_name>
-								blockUser(validUser);
-								Log.registerMessage(4007, currentUser); // LOG: Acesso do usuario <login_name> bloqueado pela autenticação etapa 3
+								JOptionPane.showMessageDialog(null, "Chave privada incorreta. Sua tentativa foi logada");
 							}
-							JOptionPane.showMessageDialog(null, "Chave privada incorreta. Sua tentativa foi logada");
+							if(loginAttempts == 2) {
+								Log.registerMessage(4005, currentUser); // LOG: Segundo erro da chave privada contabilizado para <login_name>
+								JOptionPane.showMessageDialog(null, "Chave privada incorreta. Sua tentativa foi logada");
+							}
+							if(loginAttempts == 3) {
+								JOptionPane.showMessageDialog(null, "Chave privada incorreta. Usuário Bloqueado");
+								Log.registerMessage(4006, currentUser); // LOG: Terceiro erro da chave privada contabilizado para <login_name>
+								Log.registerMessage(4007, currentUser); // LOG: Acesso do usuario <login_name> bloqueado pela autenticação etapa 3
+								panel.setVisible(false);
+							}
 						}
 					}
 					
@@ -426,11 +446,6 @@ public class MainView extends JFrame {
 
 	}
 	
-	// Block user access for 2 min
-	public void blockUser (User user) {
-		//TODO
-		JOptionPane.showMessageDialog(null, user.getUsername() + " bloqueado");
-	}
 
 	public void randomizeButtonArray(final JButton btnNewButton,
 			final JButton btnNewButton_1, final JButton btnNewButton_2,
