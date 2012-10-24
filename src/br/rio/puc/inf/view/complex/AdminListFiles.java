@@ -5,11 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 
 import javax.crypto.Cipher;
@@ -20,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import sun.misc.BASE64Decoder;
 import br.rio.puc.inf.control.instruments.Cryptography;
 import br.rio.puc.inf.model.User;
 
@@ -117,6 +121,7 @@ public class AdminListFiles extends JPanel {
 		    			try {
 							byte[] envelopeBytes = Cryptography.getEncFile(privFile + ".env");
 							byte[] encFileBytes = Cryptography.getEncFile(privFile + ".enc");
+							byte[] signatureBytes = Cryptography.getEncFile(privFile + ".asd");
 							
 			    			// Decriptar o envelope digital
 			    			Cipher cipher;
@@ -132,12 +137,35 @@ public class AdminListFiles extends JPanel {
 			    			Cipher cipherB= Cipher.getInstance("DES/ECB/PKCS5Padding");
 			    			cipherB.init(Cipher.DECRYPT_MODE, key);
 			    			
+			    			
+			    			
+			    			
 			    			// Descriptar o arquivo codificado
 			    			byte[] decFileBytes = cipherB.doFinal(encFileBytes);
 			    			
 			    			FileOutputStream fos = new FileOutputStream((String) privFile);
 			    			fos.write(decFileBytes);
 			    			fos.close();
+			    			
+			    			// Verificar assinatura digital
+			    			Signature sig = Signature.getInstance("MD5WithRSA");
+							KeyFactory rsaKeyFac =  KeyFactory.getInstance("RSA");
+							byte[] decodedBytes = new BASE64Decoder().decodeBuffer(user.getPublicKey()); //Recupera os array de bytes da string do DB
+							X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedBytes);
+							RSAPublicKey pubKey;
+							   pubKey = (RSAPublicKey) rsaKeyFac.generatePublic(keySpec);
+			    			sig.initVerify(pubKey);
+			    			sig.update((decFileBytes));
+			    			if (sig.verify(signatureBytes)) {
+								JOptionPane.showMessageDialog(null,
+										"Assinatura verificada, arquivo está íntegro!");
+			    			} else {
+								JOptionPane.showMessageDialog(null,
+										"Erro, assinatura não verificada, arquivo corrompido!");
+								return;
+			    			}
+			    			
+			    			
 			    			
 			    			
 						} catch (Exception e1) {
