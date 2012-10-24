@@ -289,6 +289,31 @@ public class AccessJDBC {
 		return num;
 	}
 	
+	// Get Group Name given ID
+	public static java.sql.Timestamp getLastBlockByUser(String username)
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		java.sql.Timestamp time = null;
+		
+		sqlQuery = "SELECT TIME_INSERTED FROM Registries WHERE Username = '" + username + "' And (Message_ID=3008 OR Message_ID=4007) AND  ID = (SELECT MAX(ID)  FROM Registries WHERE Message_ID=3008 OR Message_ID = 4007);";
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			rs.next();
+			time = rs.getTimestamp(1);
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return time;
+	}
+	
 	
 	// Insert log message in DB
 	public static void registerMessage(int ID, String username)
