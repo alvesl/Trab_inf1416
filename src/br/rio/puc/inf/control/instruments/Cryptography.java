@@ -306,7 +306,7 @@ public class Cryptography {
 	}
 	
 	// Converts an array of bytes to a HEX represented string
-	private static String toHex(byte[] array)
+	public static String toHex(byte[] array)
 	{
 		StringBuffer buf = new StringBuffer();
 	    for(int i = 0; i < array.length; i++) {

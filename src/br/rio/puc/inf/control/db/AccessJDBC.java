@@ -124,13 +124,16 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 			
-			rs.next();
-			ID = rs.getInt(1);
-			fullName = rs.getString(2);
-			groupID = rs.getInt(4);
-			dbPassword = rs.getString(5);
-			publicKey = rs.getString(6) ;
-			numLoged = rs.getInt(7);
+			if(rs.next())
+			{
+				ID = rs.getInt(1);
+				fullName = rs.getString(2);
+				username = rs.getString(3);
+				groupID = rs.getInt(4);
+				dbPassword = rs.getString(5);
+				publicKey = rs.getString(6) ;
+				numLoged = rs.getInt(7);
+			}
 			
 			rs.close();
 			stmt.close();
@@ -154,8 +157,8 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 			
-			rs.next();
-			ID = rs.getInt(1);
+			if(rs.next())
+				ID = rs.getInt(1);
 
 			rs.close();
 			stmt.close();
@@ -179,8 +182,8 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 			
-			rs.next();
-			ID = rs.getInt(1);
+			if(rs.next())
+				ID = rs.getInt(1);
 
 			rs.close();
 			stmt.close();
@@ -251,10 +254,10 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 						
-			rs.next();
-			group = rs.getString(1);
+			if(rs.next())
+				group = rs.getString(1);
 			
-			
+			rs.close();
 			stmt.close();
 		} 
 		catch (SQLException e) {
@@ -269,7 +272,7 @@ public class AccessJDBC {
 		ResultSet rs;
 		Statement stmt = null;
 		String sqlQuery;
-		int num = -1;
+		int num = 0;
 		
 		sqlQuery = "SELECT COUNT(*) FROM Users";
 		try {
@@ -277,10 +280,10 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 						
-			rs.next();
-			num = rs.getInt(1);
+			if(rs.next())
+				num = rs.getInt(1);
 			
-			
+			rs.close();
 			stmt.close();
 		} 
 		catch (SQLException e) {
@@ -383,7 +386,7 @@ public class AccessJDBC {
 		ResultSet rs;
 		Statement stmt = null;
 		String sqlQuery;
-		int num = -1;
+		int num = 0;
 		
 		sqlQuery = "SELECT Num_loged FROM Users WHERE Username = '" + username + "'";
 		try {
@@ -391,10 +394,10 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 						
-			rs.next();
-			num = rs.getInt(1);
+			if(rs.next())
+				num = rs.getInt(1);
 			
-			
+			rs.close();
 			stmt.close();
 		} 
 		catch (SQLException e) {
@@ -439,7 +442,7 @@ public class AccessJDBC {
 			if(rs.next())
 				num = rs.getInt(1);
 			
-			
+			rs.close();
 			stmt.close();
 		} 
 		catch (SQLException e) {
@@ -465,7 +468,7 @@ public class AccessJDBC {
 			if(rs.next())
 				num = rs.getInt(1);
 			
-			
+			rs.close();
 			stmt.close();
 		} 
 		catch (SQLException e) {
@@ -491,7 +494,7 @@ public class AccessJDBC {
 			if(rs.next())
 				num = rs.getInt(1);
 			
-			
+			rs.close();
 			stmt.close();
 		} 
 		catch (SQLException e) {
@@ -543,6 +546,7 @@ public class AccessJDBC {
 				array.add(str);
 			}
 			
+			rs.close();
 			stmt.close();
 		} 
 		catch (SQLException e) {

@@ -42,6 +42,7 @@ public class MainView extends JFrame {
 	private static String currentPass;
 	private BasicMenuView userView;
 	private JFrame frame = this;
+	User validUser;
 	
 	private int loginAttempts = 0;
 
@@ -167,6 +168,9 @@ public class MainView extends JFrame {
 				String username = textField.getText();
 				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
 					if (AccessJDBC.VerifyUser(username)) {
+						validUser = AccessJDBC.getUser(username);
+						currentUser = validUser.getUsername();
+						System.out.println(currentUser);
 						
 						Date currentDatetime = new Date(System.currentTimeMillis());
 						java.sql.Timestamp timestamp = new java.sql.Timestamp(currentDatetime.getTime()); 
@@ -181,7 +185,6 @@ public class MainView extends JFrame {
 							panel.setVisible(true);
 							randomizeButtonArray(btnNewButton, btnNewButton_1,
 									btnNewButton_2, btnNewButton_3, btnNewButton_4);
-							currentUser = username;
 							Log.registerMessage(3001, username); // LOG: Autenticação etapa 2 iniciada para <login_name>.
 						}
 						else {
@@ -317,7 +320,6 @@ public class MainView extends JFrame {
 				
 				
 				// Verifica Senha
-				User validUser = AccessJDBC.getUser(currentUser);
 				User toAuthUsr = new User(currentUser, null, -1, null, null);
 				toAuthUsr.setID(AccessJDBC.getUserID(currentUser));
 				String passToAuth = null;

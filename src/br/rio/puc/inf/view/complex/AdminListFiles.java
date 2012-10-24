@@ -112,7 +112,10 @@ public class AdminListFiles extends JPanel {
 
 		            int row = table.rowAtPoint(e.getPoint());
 		            int col = table.columnAtPoint(e.getPoint());
-
+		            
+		            if (row == -1  || col == -1)
+		            	return;
+		            
 		            Object selectedObj = table.getValueAt(row, col);
 		            if (col == 0) {
 		            	// Realizar rotina de decriptação
@@ -165,7 +168,7 @@ public class AdminListFiles extends JPanel {
 			    			if (sig.verify(signatureBytes)) {
 								JOptionPane.showMessageDialog(null,
 										"Assinatura verificada, arquivo está íntegro!");
-								AccessJDBC.registerMessage(8004, currentUser.getUsername(), privFile); // LOG: arq verificado com sucesso
+								AccessJDBC.registerMessage(8005, currentUser.getUsername(), privFile); // LOG: arq verificado com sucesso
 			    			} else {
 								JOptionPane.showMessageDialog(null,
 										"Erro, assinatura não verificada, arquivo corrompido!");
@@ -201,11 +204,36 @@ public class AdminListFiles extends JPanel {
 		      if (listOfFiles[i].isFile()) {
 		    	  if (listOfFiles[i].getName().endsWith(".enc")) {
 		    		  encFiles.add(listOfFiles[i]);
-		    		  modelTable.addRow(new Object[] {listOfFiles[i].getName(), null, null});
+
+
+		    		  	String env = listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length()-3);
+		    		  	env = env + "env";
+		    		  	
+		    		  	String asd = listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length()-3);
+		    		  	asd = asd + "asd";
+		    		  
+						byte[] fileBytes;
+						byte[] fileBytes2;
+						try {
+							fileBytes = Cryptography.getEncFile(env);
+							fileBytes2 = Cryptography.getEncFile(asd);
+							String hexEnv = Cryptography.toHex(fileBytes);
+							String hexAsd = Cryptography.toHex(fileBytes2);
+													
+							
+							modelTable.addRow(new Object[] {listOfFiles[i].getName(), hexAsd, hexEnv});
+						} catch (Exception e) {
+
+						}
+											
+
 		    	  }
+
+
+		    	  
+
 		      } 
 		    }
-		
 		
 	}
 }

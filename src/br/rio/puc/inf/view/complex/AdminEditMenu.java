@@ -116,21 +116,33 @@ public class AdminEditMenu extends JPanel {
 				// Compor mensagens de erro
 				
 				if(!passwd.equals("") || !passwdCheck.equals("")) {
-					if (!passwd.equals(passwdCheck)) {
-						error = error + "Senha e confirmação de senha não coincidem.\n";
+					
+					try {
+						Integer.parseInt(passwd);
+						
+						if (!passwd.equals(passwdCheck)) {
+							error = error + "Senha e confirmação de senha não coincidem.\n";
+						}
+						
+						if (PasswordTest.findRepetition(passwd)) {
+							error = error + "Repetição na senha encontrada, favor alterar.\n";
+						}
+						
+						if (PasswordTest.findSequence(passwd)) {
+							error = error + "Sequência na senha encontrada, favor alterar.\n";
+						}
+						
+						if (!PasswordTest.testLenght(passwd)) {
+							error = error + "Senha deve ter no mínimo 8 e no máximo 10 caracteres.\n";
+						}
+					}
+					catch (Exception e) {
+						error = error + "Formato inválido. Senha só pode ser formada por números.\n";
 					}
 					
-					if (PasswordTest.findRepetition(passwd)) {
-						error = error + "Repetição na senha encontrada, favor alterar.\n";
-					}
+
 					
-					if (PasswordTest.findSequence(passwd)) {
-						error = error + "Sequência na senha encontrada, favor alterar.\n";
-					}
-					
-					if (!PasswordTest.testLenght(passwd)) {
-						error = error + "Senha deve ter no mínimo 8 e no máximo 10 caracteres.\n";
-					}	
+	
 				}
 				
 				String encodedBytes = null;
