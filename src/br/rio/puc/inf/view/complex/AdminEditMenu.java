@@ -49,6 +49,7 @@ public class AdminEditMenu extends JPanel {
 		add(lblTotalDeAlteraes);
 		
 		lbChanges = new JLabel("0 altera\u00E7\u00F5es");
+		lbChanges.setText(Integer.toString(AccessJDBC.getNumChanges(currentUser.getUsername())) + " altera\u00E7\u00F5es"); 
 		lbChanges.setBounds(428, 11, 110, 14);
 		add(lbChanges);
 		

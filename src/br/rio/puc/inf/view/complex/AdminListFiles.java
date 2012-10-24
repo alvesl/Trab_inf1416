@@ -43,6 +43,7 @@ public class AdminListFiles extends JPanel {
 	private static ArrayList<File> encFiles = new ArrayList<File>();
 	private JTable table;
 	private JTable table_1;
+	JLabel lbNumTotalDeConsultas;
 	
 	
 	/**
@@ -57,9 +58,10 @@ public class AdminListFiles extends JPanel {
 		lblTotalDeConsultas.setBounds(282, 11, 150, 14);
 		add(lblTotalDeConsultas);
 		
-		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setBounds(435, 11, 46, 14);
-		add(lblNewLabel);
+		lbNumTotalDeConsultas = new JLabel("");
+		lbNumTotalDeConsultas.setText(Integer.toString(AccessJDBC.getNumQueries(currentUser.getUsername())));
+		lbNumTotalDeConsultas.setBounds(435, 11, 46, 14);
+		add(lbNumTotalDeConsultas);
 		
 		
 	
@@ -119,7 +121,8 @@ public class AdminListFiles extends JPanel {
 
 		            	privFile = privFile.substring(0, privFile.length()-4); 
 		            	AccessJDBC.registerMessage(8003, currentUser.getUsername(), privFile); // LOG: Arquivo <arq_name> selecionado por <login_name> para decriptação
-		    			try {
+		            	lbNumTotalDeConsultas.setText(Integer.toString(AccessJDBC.getNumQueries(currentUser.getUsername())));
+		            	try {
 							byte[] envelopeBytes = Cryptography.getEncFile(privFile + ".env");
 							byte[] encFileBytes = Cryptography.getEncFile(privFile + ".enc");
 							byte[] signatureBytes = Cryptography.getEncFile(privFile + ".asd");

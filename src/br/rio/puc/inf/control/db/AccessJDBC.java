@@ -428,7 +428,7 @@ public class AccessJDBC {
 		ResultSet rs;
 		Statement stmt = null;
 		String sqlQuery;
-		int num = -1;
+		int num = 0;
 		
 		sqlQuery = "SELECT COUNT(*) FROM Registries WHERE ((Message_ID = 4003) AND (Username = '" + username + "'))";
 		try {
@@ -436,8 +436,60 @@ public class AccessJDBC {
 			stmt = theConn.createStatement();
 			rs = stmt.executeQuery(sqlQuery);
 						
-			rs.next();
-			num = rs.getInt(1);
+			if(rs.next())
+				num = rs.getInt(1);
+			
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return num;
+	}
+	
+	// Get number of times passwd or public key were changed
+	public static int getNumChanges(String username)
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		int num = 0;
+		
+		sqlQuery = "SELECT COUNT(*) FROM Registries WHERE ((Message_ID = 7002) AND (Username = '" + username + "'))";
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			if(rs.next())
+				num = rs.getInt(1);
+			
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return num;
+	}
+	
+	// Get number of times passwd or public key were changed
+	public static int getNumQueries(String username)
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		int num = 0;
+		
+		sqlQuery = "SELECT COUNT(*) FROM Registries WHERE ((Message_ID = 8003) AND (Username = '" + username + "'))";
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			if(rs.next())
+				num = rs.getInt(1);
 			
 			
 			stmt.close();
