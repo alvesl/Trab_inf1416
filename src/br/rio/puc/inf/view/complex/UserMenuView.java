@@ -8,6 +8,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import br.rio.puc.inf.control.instruments.Log;
+import br.rio.puc.inf.model.User;
+
 public class UserMenuView extends JPanel {
 
 	/**
@@ -22,15 +25,17 @@ public class UserMenuView extends JPanel {
 	
 	/**
 	 * Create the panel.
+	 * @param user TODO
 	 */
-	public UserMenuView(final JPanel parentPanel,final CardLayout cl) {
+	public UserMenuView(final JPanel parentPanel,final CardLayout cl, final User user, final ExitView exit) {
 		setLayout(null);
 		
 		JButton btnNewButton_1 = new JButton("Alterar atributos de um usu\u00E1rio");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cl.show(parentPanel, EDIT);
-				
+				Log.registerMessage(5002, user.getUsername()); // LOG: Opção 1 do menu principal selecionada por <login_name>
+				cl.show(parentPanel, EDIT);		
+				Log.registerMessage(7001, user.getUsername()); // LOG: Tela de alteração apresentada para <login_name>
 			}
 		});
 		btnNewButton_1.setBounds(304, 42, 181, 23);
@@ -39,7 +44,9 @@ public class UserMenuView extends JPanel {
 		JButton btnNewButton_2 = new JButton("Consultar pasta de arquivos secretos de um usu\u00E1rio");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Log.registerMessage(5003, user.getUsername()); // LOG: Opção 2 do menu principal selecionada por <login_name>
 				cl.show(parentPanel, LIST);
+				Log.registerMessage(8001, user.getUsername()); // LOG: Tela de consulta apresentada para <login_name>.
 			}
 		});
 		btnNewButton_2.setBounds(304, 118, 181, 23);
@@ -48,7 +55,10 @@ public class UserMenuView extends JPanel {
 		JButton btnSairDoSistema = new JButton("Sair do Sistema");
 		btnSairDoSistema.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Log.registerMessage(5005, user.getUsername()); // LOG: Opção 4 do menu principal selecionada por <login_name>.
 				cl.show(parentPanel, EXIT);
+				exit.setMessage();
+				Log.registerMessage(9001, user.getUsername()); // LOG: Tela de saída apresentada para <login_name>
 			}
 		});
 		btnSairDoSistema.setBounds(304, 199, 181, 23);

@@ -17,6 +17,7 @@ import javax.swing.event.DocumentListener;
 import sun.misc.BASE64Encoder;
 import br.rio.puc.inf.control.db.AccessJDBC;
 import br.rio.puc.inf.control.instruments.Cryptography;
+import br.rio.puc.inf.control.instruments.Log;
 import br.rio.puc.inf.control.instruments.PasswordTest;
 import br.rio.puc.inf.model.User;
 
@@ -89,7 +90,6 @@ public class AdminEditMenu extends JPanel {
 					changePasswd = 1;
 				else
 					changePasswd = 0;
-				lbChanges.setText(Integer.toString(changePasswd + changePubKey) + " altera\u00E7\u00F5es");
 			}
 		});
 		passwordField.setBounds(268, 90, 378, 20);
@@ -118,7 +118,6 @@ public class AdminEditMenu extends JPanel {
 					changePasswd = 1;
 				else
 					changePasswd = 0;
-				lbChanges.setText(Integer.toString(changePasswd + changePubKey) + " altera\u00E7\u00F5es");
 			}
 		});
 		passwordField_1.setBounds(348, 127, 298, 20);
@@ -147,7 +146,6 @@ public class AdminEditMenu extends JPanel {
 					changePubKey = 1;
 				else
 					changePubKey = 0;
-				lbChanges.setText(Integer.toString(changePasswd + changePubKey) + " altera\u00E7\u00F5es");
 			}
 		});
 		tfPublicKey.setBounds(399, 174, 247, 20);
@@ -158,18 +156,15 @@ public class AdminEditMenu extends JPanel {
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 					
+					Log.registerMessage(7003, currentUser.getUsername()); // LOG: Botão voltar de alterar para o menu principal pressionado por <login_name>
 					if (currentUser.getGroupID() == 0) {
 						//User is adm group
-						
 						cl.show(parentPanel, ADMINMENU);
-						
 					} else if (currentUser.getGroupID() == 1) {
 						//User is user group
-						
-						cl.show(parentPanel, USRMENU);
-
-						
+						cl.show(parentPanel, USRMENU);		
 					}
+					Log.registerMessage(5001, currentUser.getUsername()); // LOG: Tela principal apresentada para <login_name> 
 			}
 		});
 		btnVoltar.setBounds(665, 305, 89, 23);
@@ -179,9 +174,9 @@ public class AdminEditMenu extends JPanel {
 		btnAlterar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-				//Recuperar informações preenchidas
+				Log.registerMessage(7002, currentUser.getUsername()); // LOG: Botão alterar pressionado por <login_name>
 				
-				boolean passwdChanged = false;
+				//Recuperar informações preenchidas
 				String passwd = new String (passwordField.getPassword());
 				
 				String passwdCheck = new String (passwordField_1.getPassword());
@@ -229,6 +224,7 @@ public class AdminEditMenu extends JPanel {
 					{
 						currentUser.setPassword(passwd);
 						AccessJDBC.updateDbPasswd(currentUser);
+						AccessJDBC.updateNumLogedPasswd(currentUser.getUsername(), 0);
 					}
 					
 					if(changePubKey == 1)
@@ -243,16 +239,12 @@ public class AdminEditMenu extends JPanel {
 					// Retornar a tela principal
 					if (currentUser.getGroupID() == 0) {
 						//User is adm group
-						
 						cl.show(parentPanel, ADMINMENU);
-						
 					} else if (currentUser.getGroupID() == 1) {
 						//User is user group
-						
-						cl.show(parentPanel, USRMENU);
-
-						
+						cl.show(parentPanel, USRMENU);						
 					}
+					Log.registerMessage(5001, currentUser.getUsername()); // LOG: Tela principal apresentada para <login_name>
 					
 				} else {
 					JOptionPane.showMessageDialog(null,

@@ -18,6 +18,7 @@ import sun.misc.BASE64Encoder;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
 import br.rio.puc.inf.control.instruments.Cryptography;
+import br.rio.puc.inf.control.instruments.Log;
 import br.rio.puc.inf.control.instruments.PasswordTest;
 import br.rio.puc.inf.model.User;
 
@@ -108,8 +109,9 @@ public class AdminCreateView extends JPanel {
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				//Recuperar informações preenchidas
+				Log.registerMessage(6002, currentUser.getUsername()); // LOG: Botão cadastrar pressionado por <login_name>
 				
+				//Recuperar informações preenchidas
 				String username = textField_2.getText();
 				
 				Integer group = comboBox.getSelectedIndex();
@@ -188,19 +190,16 @@ public class AdminCreateView extends JPanel {
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
+				Log.registerMessage(6003, currentUser.getUsername()); // LOG: Botão voltar de cadastrar para o menu principal pressionado por <login_name>
 				if (currentUser.getGroupID() == 0) {
 					//User is adm group
-					
 					cl.show(parentPanel, ADMINMENU);
-					
 				} else if (currentUser.getGroupID() == 1) {
 					//User is user group
 					
 					cl.show(parentPanel, USRMENU);
-
-					
 				}
-						
+				Log.registerMessage(5001, currentUser.getUsername()); // LOG: Tela principal apresentada para <login_name>
 			}
 		});
 		btnVoltar.setBounds(656, 305, 89, 23);

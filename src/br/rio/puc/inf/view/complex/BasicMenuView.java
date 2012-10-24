@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import br.rio.puc.inf.control.db.AccessJDBC;
+import br.rio.puc.inf.control.instruments.Log;
 import br.rio.puc.inf.model.User;
 
 
@@ -50,10 +51,13 @@ public class BasicMenuView extends JPanel {
 		CardLayout cl = (CardLayout) renderPanel.getLayout();
 		
 		//Criação de todas as views contidas no card
-		AdminMenuView admMenu = new AdminMenuView(renderPanel,cl);
+		ExitView exit = new ExitView(frame, renderPanel, cl, user);
+		renderPanel.add(exit, EXIT);
+		
+		AdminMenuView admMenu = new AdminMenuView(renderPanel,cl, user, exit);
 		renderPanel.add(admMenu, ADMINMENU);
 		
-		UserMenuView usrMenu = new UserMenuView(renderPanel, cl);
+		UserMenuView usrMenu = new UserMenuView(renderPanel, cl, user, exit);
 		renderPanel.add(usrMenu, USRMENU);
 		
 		AdminCreateView admCreate = new AdminCreateView(renderPanel, cl, user);
@@ -65,22 +69,15 @@ public class BasicMenuView extends JPanel {
 		AdminListFiles admList = new AdminListFiles(renderPanel, cl, user);
 		renderPanel.add(admList, LIST);
 		
-		ExitView exit = new ExitView(renderPanel, cl, user);
-		renderPanel.add(exit, EXIT);
-		
 		// Renderizar corretamente o painel do usuário ou do adm
 		if (user.getGroupID() == 0) {
 			//User is adm group
-			
 			cl.show(renderPanel, ADMINMENU);
-			
 		} else if (user.getGroupID() == 1) {
 			//User is user group
-			
-			cl.show(renderPanel, USRMENU);
-
-			
+			cl.show(renderPanel, USRMENU);	
 		}
+		Log.registerMessage(5001, user.getUsername()); // LOG: Tela principal apresentada para <login_name>
 
 	}
 }

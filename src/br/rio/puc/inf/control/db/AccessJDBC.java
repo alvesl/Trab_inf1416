@@ -1,12 +1,17 @@
 package br.rio.puc.inf.control.db;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sun.jmx.snmp.Timestamp;
 
 import br.rio.puc.inf.model.User;
 
@@ -285,7 +290,152 @@ public class AccessJDBC {
 	}
 	
 	
+	// Insert log message in DB
+	public static void registerMessage(int ID, String username)
+	{
+		PreparedStatement stmt = null;
+		String sqlInsert;
+		Date currentDatetime = new Date(System.currentTimeMillis());
+		java.sql.Timestamp timestamp = new java.sql.Timestamp(currentDatetime.getTime()); 
+        
+		if(username != null)
+			sqlInsert = "INSERT INTO Registries (Message_ID, Time_inserted, Username) VALUES(" + Integer.toString(ID) + ", " + 
+					"?, '" + username + "')";
+		else
+			sqlInsert = "INSERT INTO Registries (Message_ID, Time_inserted) VALUES('"+ Integer.toString(ID) + "', ?)";
+		
+		try {
 
+			stmt = theConn.prepareStatement(sqlInsert);
+			stmt.setTimestamp(1, timestamp);
+
+			
+			stmt.execute();
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static boolean verifyUserBlocked(String username)
+	{
+		// TODO
+		return false;
+	}
+	
+	// Get number of loged in times
+	public static int getNumLogedPasswd(String username)
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		int num = -1;
+		
+		sqlQuery = "SELECT Num_loged FROM Users WHERE Username = '" + username + "'";
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			rs.next();
+			num = rs.getInt(1);
+			
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return num;
+	}
+	
+	// Update number of times loged using current password
+	public static void updateNumLogedPasswd(String username, int numLoged)
+	{
+		Statement stmt = null;
+		String sqlUpdate;
+		
+		sqlUpdate = "UPDATE Users SET Num_loged = " + numLoged + " WHERE Username = '" + username + "'";
+		try {
+
+			stmt = theConn.createStatement();
+			stmt.executeUpdate(sqlUpdate);
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Get number of loged in times
+	public static int getNumLoged(String username)
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		int num = -1;
+		
+		sqlQuery = "SELECT COUNT(*) FROM Registries WHERE ((Message_ID = 4003) AND (Username = '" + username + "'))";
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			rs.next();
+			num = rs.getInt(1);
+			
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return num;
+	}
+	
+	// Write log into a file
+	public static List<String> getLog()
+	{
+		ResultSet rs;
+		Statement stmt = null;
+		String sqlQuery;
+		java.sql.Timestamp date = null;
+		String username = null;
+		String message = null;
+		List<String> array = new ArrayList<>();
+		
+		
+		sqlQuery = "SELECT Registries.Time_inserted, Registries.Username, Messages.Message FROM Registries INNER JOIN Messages " +
+				"ON Registries.Message_ID = Messages.ID ";// +
+				//"ORDER BY Registries.Time_inserted ASC";
+		try {
+
+			stmt = theConn.createStatement();
+			rs = stmt.executeQuery(sqlQuery);
+						
+			while(rs.next())
+			{
+				String str;
+				date = rs.getTimestamp(1);
+				username = rs.getString(2);
+				message = rs.getString(3);
+				if(username != null)
+					str = date.toString() + ": " + message.replace("<login_name>", username) + "\n";
+				else
+					str = date.toString() + ": " + message + "\n";
+				array.add(str);
+			}
+			
+			stmt.close();
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return array;
+	}
 	
 	/***********************
 	 * Getters and Setters

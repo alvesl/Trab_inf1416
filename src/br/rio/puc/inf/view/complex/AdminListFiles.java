@@ -25,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 
 import sun.misc.BASE64Decoder;
 import br.rio.puc.inf.control.instruments.Cryptography;
+import br.rio.puc.inf.control.instruments.Log;
 import br.rio.puc.inf.model.User;
 
 public class AdminListFiles extends JPanel {
@@ -65,18 +66,16 @@ public class AdminListFiles extends JPanel {
 		btnVoltar.setBounds(652, 305, 89, 23);
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				Log.registerMessage(8002, currentUser.getUsername()); // LOG: Botão voltar de consultar para o menu principal pressionado por
 				if (currentUser.getGroupID() == 0) {
 					//User is adm group
-					
 					cl.show(parentPanel, ADMINMENU);
-					
 				} else if (currentUser.getGroupID() == 1) {
 					//User is user group
-					
-					cl.show(parentPanel, USRMENU);
-
-					
+					cl.show(parentPanel, USRMENU);					
 				}
+				Log.registerMessage(5001, currentUser.getUsername()); // LOG: Tela principal apresentada para <login_name>
 			}
 		});
 		add(btnVoltar);
