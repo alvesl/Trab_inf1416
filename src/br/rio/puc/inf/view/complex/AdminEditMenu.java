@@ -52,9 +52,6 @@ public class AdminEditMenu extends JPanel {
 		lbChanges.setBounds(428, 11, 110, 14);
 		add(lbChanges);
 		
-		
-		
-		
 		JLabel lblFormulrioDeAlterao = new JLabel("Formul\u00E1rio de Altera\u00E7\u00E3o:");
 		lblFormulrioDeAlterao.setBounds(303, 36, 118, 14);
 		add(lblFormulrioDeAlterao);
@@ -72,86 +69,14 @@ public class AdminEditMenu extends JPanel {
 		add(lblCaminhoDoArquivo);
 		
 		passwordField = new JPasswordField();
-		passwordField.getDocument().addDocumentListener(new DocumentListener() {
-			
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			public void warn() {
-				if(!(new String(passwordField.getPassword()).equals("")) || !(new String(passwordField_1.getPassword()).equals("")))
-					changePasswd = 1;
-				else
-					changePasswd = 0;
-			}
-		});
 		passwordField.setBounds(268, 90, 378, 20);
 		add(passwordField);
 		
 		passwordField_1 = new JPasswordField();
-		passwordField_1.getDocument().addDocumentListener(new DocumentListener() {
-			
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			public void warn() {
-				if(!(new String(passwordField_1.getPassword()).equals("")) || !(new String(passwordField.getPassword()).equals("")))
-					changePasswd = 1;
-				else
-					changePasswd = 0;
-			}
-		});
 		passwordField_1.setBounds(348, 127, 298, 20);
 		add(passwordField_1);
 		
 		tfPublicKey = new JTextField();
-		tfPublicKey.getDocument().addDocumentListener(new DocumentListener() {
-			
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-				warn();
-			}
-			
-			public void warn() {
-				if(!tfPublicKey.getText().equals(""))
-					changePubKey = 1;
-				else
-					changePubKey = 0;
-			}
-		});
 		tfPublicKey.setBounds(399, 174, 247, 20);
 		add(tfPublicKey);
 		tfPublicKey.setColumns(10);
@@ -177,9 +102,7 @@ public class AdminEditMenu extends JPanel {
 		JButton btnAlterar = new JButton("Alterar");
 		btnAlterar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				Log.registerMessage(7002, currentUser.getUsername()); // LOG: Botão alterar pressionado por <login_name>
-				
+								
 				//Recuperar informações preenchidas
 				String passwd = new String (passwordField.getPassword());
 				
@@ -191,7 +114,7 @@ public class AdminEditMenu extends JPanel {
 				
 				// Compor mensagens de erro
 				
-				if(changePasswd == 1) {
+				if(!passwd.equals("") || !passwdCheck.equals("")) {
 					if (!passwd.equals(passwdCheck)) {
 						error = error + "Senha e confirmação de senha não coincidem.\n";
 					}
@@ -211,7 +134,7 @@ public class AdminEditMenu extends JPanel {
 				
 				String encodedBytes = null;
 				try {
-					if(changePubKey == 1) {
+					if(!publicKey.equals("")) {
 						PublicKey pubKey = Cryptography.getPublicKeyFile(publicKey);
 						byte[] keyBytes = pubKey.getEncoded();
 						encodedBytes = new BASE64Encoder().encode(keyBytes);
@@ -224,14 +147,17 @@ public class AdminEditMenu extends JPanel {
 				if (error.isEmpty()) {
 					// Recadastro com sucesso, update no banco!
 					
-					if(changePasswd == 1)
+					Log.registerMessage(7002, currentUser.getUsername()); // LOG: Botão alterar pressionado por <login_name>
+					lbChanges.setText(Integer.toString(AccessJDBC.getNumChanges(currentUser.getUsername())) + " altera\u00E7\u00F5es"); 
+					
+					if(!passwd.equals(""))
 					{
 						currentUser.setPassword(passwd);
 						AccessJDBC.updateDbPasswd(currentUser);
 						AccessJDBC.updateNumLogedPasswd(currentUser.getUsername(), 0);
 					}
 					
-					if(changePubKey == 1)
+					if(!publicKey.equals(""))
 					{
 						currentUser.setPublicKey(encodedBytes);
 						AccessJDBC.updatePublicKey(currentUser);
