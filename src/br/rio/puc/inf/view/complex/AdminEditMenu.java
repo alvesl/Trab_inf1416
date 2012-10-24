@@ -34,6 +34,7 @@ public class AdminEditMenu extends JPanel {
 	
 	private int changePubKey = 0;
 	private int changePasswd = 0;
+	private JLabel lbChanges;
 
 	/**
 	 * Create the panel.
@@ -47,9 +48,12 @@ public class AdminEditMenu extends JPanel {
 		lblTotalDeAlteraes.setBounds(231, 11, 187, 14);
 		add(lblTotalDeAlteraes);
 		
-		final JLabel lbChanges = new JLabel("0 altera\u00E7\u00F5es");
+		lbChanges = new JLabel("0 altera\u00E7\u00F5es");
 		lbChanges.setBounds(428, 11, 110, 14);
 		add(lbChanges);
+		
+		
+		
 		
 		JLabel lblFormulrioDeAlterao = new JLabel("Formul\u00E1rio de Altera\u00E7\u00E3o:");
 		lblFormulrioDeAlterao.setBounds(303, 36, 118, 14);

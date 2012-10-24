@@ -116,9 +116,9 @@ public class AdminListFiles extends JPanel {
 		            	// Realizar rotina de decriptação
 		            	
 		            	String privFile = (String) selectedObj;
-		            	AccessJDBC.registerMessage(8003, currentUser.getUsername(), privFile.replace(".", "-f")); // LOG: Arquivo <arq_name> selecionado por <login_name> para decriptação
+
 		            	privFile = privFile.substring(0, privFile.length()-4); 
-		            	
+		            	AccessJDBC.registerMessage(8003, currentUser.getUsername(), privFile); // LOG: Arquivo <arq_name> selecionado por <login_name> para decriptação
 		    			try {
 							byte[] envelopeBytes = Cryptography.getEncFile(privFile + ".env");
 							byte[] encFileBytes = Cryptography.getEncFile(privFile + ".enc");
@@ -148,6 +148,8 @@ public class AdminListFiles extends JPanel {
 			    			fos.write(decFileBytes);
 			    			fos.close();
 			    			
+			    			AccessJDBC.registerMessage(8004, currentUser.getUsername(), privFile); // LOG: arq decriptado com sucesso
+			    			
 			    			// Verificar assinatura digital
 			    			Signature sig = Signature.getInstance("MD5WithRSA");
 							KeyFactory rsaKeyFac =  KeyFactory.getInstance("RSA");
@@ -160,9 +162,11 @@ public class AdminListFiles extends JPanel {
 			    			if (sig.verify(signatureBytes)) {
 								JOptionPane.showMessageDialog(null,
 										"Assinatura verificada, arquivo está íntegro!");
+								AccessJDBC.registerMessage(8004, currentUser.getUsername(), privFile); // LOG: arq verificado com sucesso
 			    			} else {
 								JOptionPane.showMessageDialog(null,
 										"Erro, assinatura não verificada, arquivo corrompido!");
+								AccessJDBC.registerMessage(8007, currentUser.getUsername(), privFile); // LOG: erro verificação assinatura
 								return;
 			    			}
 			    			
@@ -172,6 +176,7 @@ public class AdminListFiles extends JPanel {
 						} catch (Exception e1) {
 							JOptionPane.showMessageDialog(null,
 									"Erro, verifique se algum arquivo está faltando ou corrompido!");
+							AccessJDBC.registerMessage(8006, currentUser.getUsername(), privFile); // LOG: erro decriptacao
 							return;
 						}
 		    			
