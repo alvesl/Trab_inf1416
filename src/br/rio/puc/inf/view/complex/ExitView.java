@@ -45,8 +45,8 @@ public class ExitView extends JPanel {
 		add(lblNewLabel);
 		
 		lbMensagem = new JLabel("");
-		lbMensagem.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lbMensagem.setBounds(100, 103, 583, 151);
+		lbMensagem.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lbMensagem.setBounds(10, 69, 765, 185);
 		add(lbMensagem);
 		
 		
@@ -89,9 +89,8 @@ public class ExitView extends JPanel {
 		numLogedPasswd = AccessJDBC.getNumLogedPasswd(currentUser.getUsername());
 		if(numLogedPasswd == 3)
 		{
-			lbMensagem.setText("Sua senha está vencida. \n" +
-					"Para sair, é necessário ter uma senha pessoal válida para o próximo acesso. \n" +
-					"Pressione o botão Voltar de Sair para o Menu Principal.");
+			lbMensagem.setText("Sua senha está vencida." +
+					"Para sair, é necessário ter uma senha pessoal válida para o próximo acesso.");
 			btnSair.setVisible(false);
 		}
 		else
